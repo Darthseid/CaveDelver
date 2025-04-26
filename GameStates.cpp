@@ -312,14 +312,26 @@ void overworld(Player hero)
 }
 
 
-void checkGameOver() 
+void checkGameOver(Player& hero)
 {
-    if (player.currentHealth <= 0) 
+    if (hero.currentHealth <= 0)
     {
-        std::cout << "\nYou have died.\n";
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        exit(0);
+        std::cout << "\nYou have died.";
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        exit(0); // In the future, it sends the player to the main menu.
     }
+}
+
+bool checkDeadEnemy(Player& hero, Enemy& foe) // Added '&' to refer to the original enemy object.
+{
+    if (foe.health <= 0) // Dead enemy.
+    {
+        std::cout << "\n" << foe.name << " has been defeated.";
+        hero.experience += foe.bounty;
+        std::cout << "\nYou gain " << foe.bounty << " Experience Points."; // Fixed concatenation and formatting.
+        return true;
+    }
+    return false; // This means the enemy is still alive.
 }
 
 void checkGameCompletion() 
