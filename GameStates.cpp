@@ -7,6 +7,8 @@
 #include "DelverHelpers.h"
 #include "DelverTemplates.h"
 #include "Spells.cpp"
+#include <thread>
+#include <chrono>
 
 void movePlayer()
 {
@@ -44,14 +46,16 @@ Enemy getEnemyForTile()
     std::string type = maps[currentMapIndex]
         .grid[player.coordinates[0]][player.coordinates[1]].type;
 
-        if (type == "Enemy") {
+        if (type == "Enemy") 
+        {
             if (currentMapIndex == 0) return goblin;
             if (currentMapIndex == 1) return orc;
             if (currentMapIndex == 2) return ogre;
             if (currentMapIndex == 3) return troll;
             if (currentMapIndex == 4) return goliath;
         }
-        else if (type == "Boss") {
+        else if (type == "Boss")
+        {
             if (currentMapIndex == 0) return hugeBear;
             if (currentMapIndex == 1) return golem;
             if (currentMapIndex == 2) return spider;
@@ -70,105 +74,77 @@ bool playerGoesFirst(int playerInit, int enemyInit)
     return RandomChance(50); // initiative tie
 }
 
-bool playerCombatTurn() {
+void playerCombatTurn(Player& hero, Enemy& foe) 
+{
     std::cout << "\nChoose Action: [A]ttack, [M]agic, [F]lee: ";
     char choice;
     std::cin >> choice;
     clearInput();
-
-    switch (toupper(choice)) {
+    switch (toupper(choice)) 
+    {
     case 'A':
-        std::cout << "You attack!\n";
-        // TODO: Implement attack system
+        playerAttack(foe, hero);
         break;
     case 'M':
-        std::cout << "You open your spellbook.\n";
-        // TODO: Implement magic casting
+        spellMenu(hero, foe);
         break;
     case 'F':
         if (RandomChance(50)) 
         {
             std::cout << "You successfully fled.\n";
-            return true; // flee success
+            overWorld();
+            break;
         }
         else 
         {
             std::cout << "Flee failed! The enemy attacks!\n";
-            // TODO: Enemy attacks player
-            return false;
+            enemyAttack(foe, hero);
+            break;
         }
     default:
         std::cout << "Invalid choice. Try again.\n";
-        return playerCombatTurn(); // re-prompt
+        playerCombatTurn(); // re-prompt
     }
-    return false; // still in combat
 }
 
-bool playerAttack(Enemy& enemy) 
+void playerAttack(Enemy& foe, Player& hero) 
 {
-    int chance = player.accuracy - enemy.evasion();
+    int chance = player.accuracy - foe.evasion();
     if (RandomChance(chance)) 
     {
-        std::cout << "You Hit!\n";
-        enemy.health -= player.damage;
-        std::cout << enemy.getName() << " takes " << player.damage
-            << " damage (HP left: " << enemy.getHealth() << ")\n";
-        checkEnemyHealth()
-        }
+        std::cout << "\n You Hit!";
+        foe.health -= hero.damage;
+        std::cout << "\n" << foe.name << " takes " << hero.damage << " damage (HP left: " << foe.health << ")";
     }
     else 
         std::cout << "You Missed!\n";
-    return false; // still fighting
 }
 
-bool checkEnemyHealth(Enemy& enemy) 
+void clearTile(int location[2])
 {
-    if (enemy.getHealth() <= 0) 
-    {
-        std::cout << "Enemy defeated! +" << enemy.getBounty() << " XP.\n";
-        player.experience += enemy.getBounty();   
-        Tile& tile = maps[currentMapIndex].grid[player.coordinates[0]][player.coordinates[1]];
+        Tile& tile = maps[currentMapIndex].grid[player.coordinates[0]][player.coordinates[1]]; //Player's current location.
         tile.cleared = true;  // Mark the tile as cleared
-        return true; // Combat over
-    }
-    return false; // Enemy still alive
 }
 
-bool enemyAttack(Enemy& enemy)
+void enemyAttack(Enemy& foe, Player& hero)
 {
     int chance = player.accuracy - enemy.evasion();
     if (RandomChance(chance))
     {
-        std::cout << "You got Hit!\n";
-        player.health -= enemy.damage;
-        std::cout << " You take " << enemy.damage
-            << " damage (HP left: " << enemy.getHealth() << ")\n";
-        checkEnemyHealth()
+        std::cout << "\n You got Hit!";
+        hero.currentHealth -= foe.damage;
+        std::cout << "\n You take " << foe.damage << " damage (HP left: " << player.currentHealth << ")";
     }
-}
     else
-        std::cout << "You Missed!\n";
-   return false; // still fighting
+        std::cout << foe.name << "\n Missed!";
 }
 
-bool checkPlayerHealth(Player& player)
-{
-    if (player.health <= 0)
-    {
-        std::cout << "You Died. Game Over.";
-        Sleep(3000);
-        System.exit(1);
-        return true; // Combat over
-    }
-    return false; // Enemy still alive
-}
-
-bool castSpellMenu(Enemy& enemy) 
+bool spellMenu(Player& hero, Enemy& foe) 
 {
     std::cout << "\n=== Spellbook ===\n";
-    for (size_t i = 0; i < player.spells.size(); ++i)
+    for (size_t i = 0; i < hero.spells.size(); ++i)
     {
-        const Spell& s = player.spells[i];
+        const Spell& s = hero.spells[i];
         std::cout << i + 1 << ". " << s.name << " (Cost: " << s.manaCost << ") - " << s.description << "\n";
     }
     std::cout << "0. Cancel\n";
@@ -180,13 +156,14 @@ bool castSpellMenu(Enemy& enemy)
 
     if (choice == 0) return false; // cancel -> return to combat menu
 
-    if (choice < 1 || choice > static_cast<int>(player.spells.size())) {
+    if (choice < 1 || choice > static_cast<int>(player.spells.size())) 
+    {
         std::cout << "Invalid selection.\n";
-        return castSpellMenu(enemy); // re-prompt
+        return SpellMenu(foe); // re-prompt
     }
 
-    Spell& selected = player.spells[choice - 1];
-    if (player.currentMana < selected.manaCost) 
+    Spell& selected = hero.spells[choice - 1];
+    if (hero.currentMana < selected.manaCost) 
     {
         std::cout << "Not enough mana to cast " << selected.name << ".\n";
         return false;
@@ -203,15 +180,16 @@ bool castSpellMenu(Enemy& enemy)
     return true; // spell was cast successfully
 }
 
-void handleCombat(Player& hero, Enemy& foe, bool playerFirst) 
+void handleCombat(Player& hero, Enemy& foe) 
 {
     int currentRound = 0;
+    bool playerAttacksFirst = playerGoesFirst(hero.initiative, foe, initiative);
     while (hero.currentHealth > 0 && foe.getHealth() > 0)
     {
         std::cout << "Round " << currentRound + 1 << "\n";
-        if (playerFirst) 
+        if (playerAttacksFirst) 
         {
-            playerCombatTurn(enemy); // Includes attack flow
+            playerCombatTurn(hero, foe); // Includes attack flow
             if (foe.getHealth() > 0) 
                 enemyAttack(foe); // Enemy attacks back
         }
@@ -224,13 +202,15 @@ void handleCombat(Player& hero, Enemy& foe, bool playerFirst)
         currentRound++;
     }
     checkGameOver(Player hero);
-    checkDeadEnemy(enemy foe);
+    if (checkDeadEnemy(Enemy& foe)) //If the enemy is dead.
+    {
+        clearTile(hero.coordinates);
+        overWorld();
+    }
 }
 
 void initiatePlayer() 
 {
-    std::string playerName;
-
     // Create player with default starting stats
     Player p(
         6,     // maxHealth
@@ -239,27 +219,20 @@ void initiatePlayer()
         0,     // evasion
         1,     // initiative
         2,     // damage
-        0, 0); // start position x=0, y=0
+        0, 0, 0); // start position x=0, y=0
 
-    p.coordinates[2] = 0; // starting map
     p.currentHealth = p.maxHealth;
     p.currentMana = p.maxMana;
 
-    // Assign to global player
-    Player = p;
-
-    // Generate map 0
-    maps[0].generateMap1();
+    Player = p;  // Assign to global player
+    maps[0].generateMap1(); // Generate map 0
     currentMapIndex = 0;
 
-    std::cout << "\nWelcome, " << player.name << "! Your journey begins...\n";
-    std::cout << "Game session ended.\n";
+    std::cout "! Your journey begins...\n";
+    overWorld(p);
 }
 
-#include <thread>
-#include <chrono>
-
-void overworld(Player hero) 
+void overWorld(Player& hero) 
 {
     while (true)
     {
