@@ -1,305 +1,61 @@
+// DelverMap.h
+#pragma once
+
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
 #include <iomanip>
 
-const int MAP_SIZE = 10; //Each map is a 10x10 grid. There are 5 maps total (0-4). Overall, there are 500 tiles in the game.
+const int MAP_SIZE = 10;
+const int TOTAL_MAPS = 5;
 
-class Tile
-{
+// Represents a single Tile (x,y,z) with a type and cleared status
+class Tile {
 public:
     int x, y, z;
     std::string type;
-    bool cleared; // New boolean attribute
+    bool cleared;
 
-    Tile(int x, int y, int z = 0, const std::string& type = "Empty", bool cleared = false)
+    Tile(int x = 0, int y = 0, int z = 0, const std::string& type = "Empty", bool cleared = false)
         : x(x), y(y), z(z), type(type), cleared(cleared) {
     }
 
     void print() const {
-        std::cout << "(" << x << "," << y << "," << z << "): " << type << " | Cleared: " << (cleared ? "Yes" : "No") << "\n";
+        std::cout << "(" << x << "," << y << "," << z << "): "
+            << type << " | Cleared: " << (cleared ? "Yes" : "No") << "\n";
     }
 };
 
-class Map 
-{
+// Represents a 10x10 Map of Tiles (fixed z-level)
+class Map {
 public:
+    int z; // Map level
     std::vector<std::vector<Tile>> grid;
-    Map() 
-    {
-        grid.resize(MAP_SIZE, std::vector<Tile>(MAP_SIZE, Tile(0, 0, "Empty")));
-        for (int i = 0; i < MAP_SIZE; ++i) 
-        {
-            for (int j = 0; j < MAP_SIZE; ++j) 
-                grid[i][j] = Tile(i, j, "Empty");
+
+    Map(int zLevel = 0) : z(zLevel) {
+        grid.resize(MAP_SIZE, std::vector<Tile>(MAP_SIZE));
+        for (int x = 0; x < MAP_SIZE; ++x) {
+            for (int y = 0; y < MAP_SIZE; ++y) {
+                grid[x][y] = Tile(x, y, z);
+            }
         }
     }
 
-    void setTile(int x, int y, const std::string& type) 
-    {
-        if (x >= 0 && x < MAP_SIZE && y >= 0 && y < MAP_SIZE) 
+    void setTile(int x, int y, const std::string& type) {
+        if (x >= 0 && x < MAP_SIZE && y >= 0 && y < MAP_SIZE) {
             grid[x][y].type = type;
-    }
-
-    void printMap() const 
-    {
-        for (int i = 0; i < MAP_SIZE; ++i) 
-        {
-            for (int j = 0; j < MAP_SIZE; ++j) 
-            {
-                std::cout << std::setw(12) << grid[i][j].type;
-            }
-            std::cout << "\n";
         }
     }
 
-    void generateMap1() 
-    {
-        int x = 0, y = 9; // Start at (0,5)
-        while (x < MAP_SIZE)
-        {
-            setTile(x, y, "Rest");   // Ensure the grid stays within a 10x10 boundary   
-            y += 9; // Move up 9 tiles along the Y-axis
-            if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-            {
-                y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                x++;        // Shift to the next column on X-axis
-            }
-            if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-        }
-        x = 0, y = 5;
-            while (x < MAP_SIZE) 
-            { 
-                setTile(x, y, "Enemy");   // Ensure the grid stays within a 10x10 boundary   
-                y += 5; // Move up 5 tiles along the Y-axis
-                if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-                {
-                    y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                    x++;        // Shift to the next column on X-axis
-                }
-                if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-            }
-        setTile(4, 7, "Enemy");
-        setTile(1, 1, "Rest");
-
-        setTile(9, 7, "Trap");
-        setTile(7, 7, "Trap"); // Traps
-        setTile(8, 6, "Trap");
-        setTile(8, 8, "Trap");
-        setTile(0, 6, "Trap");
-
-        // Treasure, Boss, Exit Ladder
-        setTile(9, 2, "Treasure");
-        setTile(8, 7, "Boss");
-        setTile(8, 9, "Ladder");
-    }
-    void generateMap2()
-    {
-        int x = 0, y = 8; // Start at (0,5)
-        while (x < MAP_SIZE)
-        {
-            setTile(x, y, "Rest");   // Ensure the grid stays within a 10x10 boundary   
-            y += 9; // Move up 9 tiles along the Y-axis
-            if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-            {
-                y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                x++;        // Shift to the next column on X-axis
-            }
-            if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-        }
-        x = 0, y = 4;
-        while (x < MAP_SIZE)
-        {
-            setTile(x, y, "Enemy");   // Ensure the grid stays within a 10x10 boundary   
-            y += 5; // Move up 5 tiles along the Y-axis
-            if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-            {
-                y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                x++;        // Shift to the next column on X-axis
-            }
-            if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-        }
-        setTile(4, 8, "Enemy");
-        setTile(2, 1, "Rest");
-
-        setTile(5, 2, "Trap");
-        setTile(3, 1, "Trap"); // Traps
-        setTile(9, 9, "Trap");
-        setTile(0, 9, "Trap");
-        setTile(0, 1, "Trap");
-
-        // Treasure, Boss, Exit Ladder
-        setTile(5, 5, "Treasure");
-        setTile(7, 9, "Boss");
-        setTile(9, 5, "Ladder");
-    }
-    void generateMap3()
-    {
-        int x = 0, y = 7; // Start at (0,5)
-        while (x < MAP_SIZE)
-        {
-            setTile(x, y, "Rest");   // Ensure the grid stays within a 10x10 boundary   
-            y += 9; // Move up 9 tiles along the Y-axis
-            if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-            {
-                y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                x++;        // Shift to the next column on X-axis
-            }
-            if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-        }
-        x = 0, y = 3;
-        while (x < MAP_SIZE)
-        {
-            setTile(x, y, "Enemy");   // Ensure the grid stays within a 10x10 boundary   
-            y += 5; // Move up 5 tiles along the Y-axis
-            if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-            {
-                y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                x++;        // Shift to the next column on X-axis
-            }
-            if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-        }
-        setTile(4, 8, "Enemy");
-        setTile(2, 1, "Rest");
-
-        setTile(5, 2, "Trap");
-        setTile(3, 1, "Trap"); // Traps
-        setTile(9, 9, "Trap");
-        setTile(0, 9, "Trap");
-        setTile(0, 1, "Trap");
-
-        // Treasure, Boss, Exit Ladder
-        setTile(5, 5, "Treasure");
-        setTile(7, 9, "Boss");
-        setTile(9, 5, "Ladder");
-    }
-    void generateMap4()
-    {
-        int x = 0, y = 6; // Start at (0,5)
-        while (x < MAP_SIZE)
-        {
-            setTile(x, y, "Rest");   // Ensure the grid stays within a 10x10 boundary   
-            y += 9; // Move up 9 tiles along the Y-axis
-            if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-            {
-                y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                x++;        // Shift to the next column on X-axis
-            }
-            if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-        }
-        x = 0, y = 2;
-        while (x < MAP_SIZE)
-        {
-            setTile(x, y, "Enemy");   // Ensure the grid stays within a 10x10 boundary   
-            y += 5; // Move up 5 tiles along the Y-axis
-            if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-            {
-                y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                x++;        // Shift to the next column on X-axis
-            }
-            if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-        }
-        setTile(4, 8, "Enemy");
-        setTile(2, 1, "Rest");
-
-        setTile(5, 2, "Trap");
-        setTile(3, 1, "Trap"); // Traps
-        setTile(9, 9, "Trap");
-        setTile(0, 9, "Trap");
-        setTile(0, 1, "Trap");
-
-        // Treasure, Boss, Exit Ladder
-        setTile(5, 5, "Treasure");
-        setTile(7, 9, "Boss");
-        setTile(9, 5, "Ladder");
-    }
-    void generateMap5()
-    {
-        int x = 0, y = 5; // Start at (0,5)
-        while (x < MAP_SIZE)
-        {
-            setTile(x, y, "Rest");   // Ensure the grid stays within a 10x10 boundary   
-            y += 9; // Move up 9 tiles along the Y-axis
-            if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-            {
-                y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                x++;        // Shift to the next column on X-axis
-            }
-            if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-        }
-        x = 0, y = 1;
-        while (x < MAP_SIZE)
-        {
-            setTile(x, y, "Enemy");   // Ensure the grid stays within a 10x10 boundary   
-            y += 5; // Move up 5 tiles along the Y-axis
-            if (y >= 10)  // When Y exceeds the grid boundary, reset Y and move to the next column (X-axis)
-            {
-                y = y % 10; // Wrap Y-coordinate to stay within grid bounds
-                x++;        // Shift to the next column on X-axis
-            }
-            if (x >= 10) break;     // Break condition: If X exceeds the grid boundary, exit the loop
-        }
-        setTile(4, 8, "Enemy");
-        setTile(2, 1, "Rest");
-
-        setTile(5, 2, "Trap");
-        setTile(3, 1, "Trap"); // Traps
-        setTile(9, 9, "Trap");
-        setTile(0, 9, "Trap");
-        setTile(0, 1, "Trap");
-
-        // Treasure, Boss, Exit Ladder
-        setTile(5, 5, "Treasure");
-        setTile(7, 9, "Boss");
-        setTile(9, 5, "Ladder");
-    }
-    void saveMap(int mapIndex) const 
-    {
-        std::ofstream out("Map" + std::to_string(mapIndex) + ".txt");
-        if (!out.is_open()) 
-        {
-            std::cerr << "Failed to save Map" << mapIndex << "\n";
-            return;
-        }
-
-        for (int x = 0; x < MAP_SIZE; ++x) 
-        {
-            for (int y = 0; y < MAP_SIZE; ++y) 
-            {
-                const Tile& t = grid[x][y];
-                out << t.x << ' ' << t.y << ' ' << t.type << ' ' << t.cleared << '\n';
-            }
-        }
-        out.close();
-    }
-    void loadMap(int mapIndex) 
-    {
-        std::ifstream in("Map" + std::to_string(mapIndex) + ".txt");
-        if (!in.is_open()) 
-        {
-            std::cerr << "No saved map found for Map" << mapIndex << ", using default.\n";
-            return;
-        }
-        int x, y;
-        std::string type;
-        bool cleared;
-
-        while (in >> x >> y >> type >> cleared)
-        {
-            setTile(x, y, type);
-            grid[x][y].cleared = cleared;
-        }
-        in.close();
-    }
-    void showMap(const Map& currentMap, const Player& player) {
-        std::cout << "\n=== Map " << player.coordinates[2] << " View ===\n";
-
+    void printMap(const int playerX, const int playerY) const {
+        std::cout << "\n=== Map Floor " << z << " ===\n";
         for (int y = MAP_SIZE - 1; y >= 0; --y) {
             for (int x = 0; x < MAP_SIZE; ++x) {
-                const Tile& tile = currentMap.grid[x][y];
+                const Tile& tile = grid[x][y];
 
-                if (player.coordinates[0] == x && player.coordinates[1] == y) {
-                    std::cout << " P "; // Player position
+                if (playerX == x && playerY == y) {
+                    std::cout << " P ";
                 }
                 else if (!tile.cleared) {
                     std::cout << " ? ";
@@ -312,12 +68,73 @@ public:
                     else if (tile.type == "Enemy") std::cout << " E ";
                     else if (tile.type == "Rest") std::cout << " R ";
                     else if (tile.type == "Ladder") std::cout << " L ";
-                    else std::cout << " ? "; // fallback
+                    else std::cout << " ? ";
                 }
             }
             std::cout << "\n";
         }
         std::cout << "Legend: P=Player _=Empty E=Enemy B=Boss T=Trap X=Treasure R=Rest L=Ladder ?=Unexplored\n";
     }
+
+    void saveMap() const {
+        std::ofstream out("Map" + std::to_string(z) + ".txt");
+        if (!out.is_open()) {
+            std::cerr << "Failed to save Map " << z << "\n";
+            return;
+        }
+
+        for (const auto& row : grid) {
+            for (const auto& tile : row) {
+                out << tile.x << ' ' << tile.y << ' ' << tile.z << ' ' << tile.type << ' ' << tile.cleared << '\n';
+            }
+        }
+        out.close();
+    }
+
+    void loadMap() {
+        std::ifstream in("Map" + std::to_string(z) + ".txt");
+        if (!in.is_open()) {
+            std::cerr << "No saved map found for Map " << z << ", using default.\n";
+            return;
+        }
+
+        int x, y, tileZ;
+        std::string type;
+        bool cleared;
+
+        while (in >> x >> y >> tileZ >> type >> cleared) {
+            if (x >= 0 && x < MAP_SIZE && y >= 0 && y < MAP_SIZE) {
+                grid[x][y] = Tile(x, y, tileZ, type, cleared);
+            }
+        }
+        in.close();
+    }
 };
 
+// Represents the entire Cave (collection of 5 Maps)
+class Cave {
+public:
+    std::vector<Map> floors;
+
+    Cave() {
+        for (int i = 0; i < TOTAL_MAPS; ++i) {
+            floors.emplace_back(i);
+        }
+    }
+
+    Map& getCurrentMap(int z) {
+        return floors[z];
+    }
+
+    void saveCave() {
+        for (auto& map : floors) {
+            map.saveMap();
+        }
+    }
+
+    void loadCave() {
+        for (auto& map : floors) {
+            map.loadMap();
+        }
+    }
+};
