@@ -10,7 +10,7 @@
 #include <thread>
 #include <chrono>
 
-void movePlayer()
+void movePlayer(Player& hero)
 {
     while (true)
     {
@@ -18,8 +18,8 @@ void movePlayer()
         char dir;
         std::cin >> dir;
         clearInput();
-        int newX = player.coordinates[0];
-        int newY = player.coordinates[1];
+        int newX = hero.coordinates[0];
+        int newY = hero.coordinates[1];
         switch (toupper(dir)) 
         {
         case 'N': newY += 1; break;
@@ -34,14 +34,14 @@ void movePlayer()
             std::cout << "You cannot move off the map.\n";
             continue;
         }
-        Player.coordinates[0] = newX;
-        Player.coordinates[1] = newY;
+        hero.coordinates[0] = newX;
+        hero.coordinates[1] = newY;
         break;
     }
     handlePostMovementEvent();
 }
 
-Enemy getEnemyForTile() 
+Enemy getEnemyForTile(int location[2])
 {
     std::string type = maps[currentMapIndex]
         .grid[player.coordinates[0]][player.coordinates[1]].type;
@@ -71,7 +71,7 @@ bool playerGoesFirst(int playerInit, int enemyInit)
 {
     if (playerInit > enemyInit) return true;
     if (enemyInit > playerInit) return false;
-    return RandomChance(50); // initiative tie
+    return randomChance(50); // initiative tie
 }
 
 void playerCombatTurn(Player& hero, Enemy& foe) 
@@ -89,7 +89,7 @@ void playerCombatTurn(Player& hero, Enemy& foe)
         spellMenu(hero, foe);
         break;
     case 'F':
-        if (RandomChance(50)) 
+        if (randomChance(50)) 
         {
             std::cout << "You successfully fled.\n";
             overWorld();
@@ -103,13 +103,13 @@ void playerCombatTurn(Player& hero, Enemy& foe)
         }
     default:
         std::cout << "Invalid choice. Try again.\n";
-        playerCombatTurn(); // re-prompt
+        playerCombatTurn(hero, foe); //re-prompt
     }
 }
 
 void playerAttack(Enemy& foe, Player& hero) 
 {
-    int chance = player.accuracy - foe.evasion();
+    int chance = hero.accuracy - foe.evasion();
     if (RandomChance(chance)) 
     {
         std::cout << "\n You Hit!";
@@ -122,13 +122,13 @@ void playerAttack(Enemy& foe, Player& hero)
 
 void clearTile(int location[2])
 {
-        Tile& tile = maps[currentMapIndex].grid[player.coordinates[0]][player.coordinates[1]]; //Player's current location.
+        Tile& tile = maps[currentMapIndex].grid[location[0], location[1]]; //Player's current location.
         tile.cleared = true;  // Mark the tile as cleared
 }
 
 void enemyAttack(Enemy& foe, Player& hero)
 {
-    int chance = player.accuracy - enemy.evasion();
+    int chance = foe.accuracy - hero.evasion();
     if (RandomChance(chance))
     {
         std::cout << "\n You got Hit!";
@@ -139,70 +139,64 @@ void enemyAttack(Enemy& foe, Player& hero)
         std::cout << foe.name << "\n Missed!";
 }
 
-bool spellMenu(Player& hero, Enemy& foe) 
+void spellMenu(Player& hero, Enemy& foe) 
 {
-    std::cout << "\n=== Spellbook ===\n";
+    std::cout << "\n=== Spellbook ===";
     for (size_t i = 0; i < hero.spells.size(); ++i)
     {
         const Spell& s = hero.spells[i];
-        std::cout << i + 1 << ". " << s.name << " (Cost: " << s.manaCost << ") - " << s.description << "\n";
+        std::cout << "\n " << i + 1 << ". " << s.name << " (Cost: " << s.manaCost << ") - " << s.description << "";
     }
-    std::cout << "0. Cancel\n";
-    std::cout << "Select a spell: ";
+    std::cout << "\n 0. Cancel";
+    std::cout << "\n Select a spell: ";
 
     int choice;
     std::cin >> choice;
     clearInput();
 
-    if (choice == 0) return false; // cancel -> return to combat menu
-
-    if (choice < 1 || choice > static_cast<int>(player.spells.size())) 
+    if (choice == 0) playerCombatTurn(hero, foe); // cancel -> return to combat menu
+    if (choice < 0 || choice > static_cast<int>(player.spells.size())) //Out of bounds int selection.
     {
-        std::cout << "Invalid selection.\n";
-        return SpellMenu(foe); // re-prompt
+        std::cout << "\n Invalid selection.";
+        spellMenu(hero, foe); // re-prompt
     }
-
     Spell& selected = hero.spells[choice - 1];
     if (hero.currentMana < selected.manaCost) 
     {
-        std::cout << "Not enough mana to cast " << selected.name << ".\n";
+        std::cout << "\n Not enough mana to cast " << selected.name << ".";
         return false;
     }
-
-    // Spend mana
-    player.currentMana -= selected.manaCost;
+    player.currentMana -= selected.manaCost; // Spend mana
     std::cout << "You cast " << selected.name << "!\n";
 
     // TODO: Implement spell effect by name (in next step)
     // For now, just placeholder
     std::cout << "The spell effect takes place.\n";
-
-    return true; // spell was cast successfully
 }
 
 void handleCombat(Player& hero, Enemy& foe) 
-{
-    int currentRound = 0;
-    bool playerAttacksFirst = playerGoesFirst(hero.initiative, foe, initiative);
-    while (hero.currentHealth > 0 && foe.getHealth() > 0)
+{ //Handle Player fleeing logic.
+    int currentRound = 1;
+    bool playerAttacksFirst = playerGoesFirst(hero.initiative, foe.initiative);
+    while (hero.currentHealth > 0 && foe.health > 0)
     {
-        std::cout << "Round " << currentRound + 1 << "\n";
+        std::cout << "\n Round " << currentRound << std::endl;
         if (playerAttacksFirst) 
         {
             playerCombatTurn(hero, foe); // Includes attack flow
-            if (foe.getHealth() > 0) 
-                enemyAttack(foe); // Enemy attacks back
+            if (foe.health > 0) 
+                enemyAttack(foe, hero); // Enemy attacks back
         }
         else 
         {
-            enemyAttack(foe); // Enemy attacks first
+            enemyAttack(foe, hero); // Enemy attacks first
             if (hero.currentHealth > 0)
-                playerCombatTurn(foe);
+                playerCombatTurn(hero, foe);
         }
         currentRound++;
     }
-    checkGameOver(Player hero);
-    if (checkDeadEnemy(Enemy& foe)) //If the enemy is dead.
+    checkGameOver(Player& hero);
+    if (checkDeadEnemy(foe, hero)) //If the enemy is dead.
     {
         clearTile(hero.coordinates);
         overWorld();
@@ -249,10 +243,10 @@ void overWorld(Player& hero)
         switch (choice)
         {
         case 1:
-            movePlayer();
+            movePlayer(hero);
             break;
         case 2:
-            showMap(maps[hero.coordinates[2]], hero);
+            showMap(maps[hero.coordinates[2]]);
             break;
         case 3:
             if (hero.currentMana < 3) 
@@ -274,11 +268,11 @@ void overWorld(Player& hero)
             maps[hero.coordinates[2]].saveMap(hero.coordinates[2]);
             break;
         case 5:
-            std::cout << "Exiting game...\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::cout << "\n Exiting game...";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             exit(0);
         default:
-            std::cout << "Invalid option. Try again.\n";
+            std::cout << "\n Invalid option. Try again.";
             break;
         }
     }

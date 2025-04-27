@@ -17,61 +17,21 @@
 
 extern Map maps[5]; // 5 maps
 extern int currentMapIndex;
-extern Player player; // Assume you have Map map[5]; and Player player;
-bool gameOver = false;
 
-
-
-// Helper: Clear input stream
-void clearInput() 
+void clearInput()  // Helper: Clear input stream
 {
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-void movePlayer()
+void handlePostMovementEvent(Player& hero)
 {
-    while (true)
-    {
-        std::cout << "\nChoose direction (N/S/E/W): ";
-        char dir;
-        std::cin >> dir;
-        clearInput();
-
-        int newX = player.coordinates[0];
-        int newY = player.coordinates[1];
-
-        switch (toupper(dir)) {
-        case 'N': newY += 1; break;
-        case 'S': newY -= 1; break;
-        case 'E': newX += 1; break;
-        case 'W': newX -= 1; break;
-        default:
-            std::cout << "Invalid input. Try N/S/E/W.\n";
-            continue;
-        }
-
-        if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE) {
-            std::cout << "You cannot move off the map.\n";
-            continue;
-        }
-
-        player.coordinates[0] = newX;
-        player.coordinates[1] = newY;
-        break;
-    }
-    handlePostMovementEvent();
-}
-
-
-void handlePostMovementEvent(Player hero)
-{
-    Tile& tile = maps[currentMapIndex].grid[player.coordinates[0]][player.coordinates[1]];
+    Tile& tile = maps[currentMapIndex].grid[hero.coordinates[0]][hero.coordinates[1]];
     std::string& type = tile.type; // Post-movement event handler
     bool reached = tile.cleared;
-    int hp = player.currentHealth;
+    int hp = hero.currentHealth;
 
-    std::cout << "You stepped on: " << type << "\n";
+    std::cout << "\n You stepped on: " << type << "";
 
     if (type == "Empty") 
     {
@@ -82,7 +42,8 @@ void handlePostMovementEvent(Player hero)
         if (!reached)
         {
         std::cout << "Combat begins!\n";
-        // TODO: Combat system here
+        Enemy foe = getEnemyForTile(hero.coordinates);
+        handleCombat(hero, foe);
         }
     }
     else if (type == "Trap") 
@@ -91,7 +52,7 @@ void handlePostMovementEvent(Player hero)
         {
             std::cout << "It's a trap! You take 5 damage!\n";
             hero.currentHealth -= 4;
-            checkGameOver();
+            checkGameOver(hero);
         }
         reached = true;
     }

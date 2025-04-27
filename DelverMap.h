@@ -3,22 +3,21 @@
 #include <string>
 #include <iomanip>
 
-const int MAP_SIZE = 10;
+const int MAP_SIZE = 10; //Each map is a 10x10 grid. There are 5 maps total (0-4). Overall, there are 500 tiles in the game.
 
 class Tile
 {
 public:
-    int x, y;
+    int x, y, z;
     std::string type;
     bool cleared; // New boolean attribute
 
-    Tile(int x, int y, const std::string& type = "Empty", bool cleared = false)
-        : x(x), y(y), type(type), cleared(cleared) {
+    Tile(int x, int y, int z = 0, const std::string& type = "Empty", bool cleared = false)
+        : x(x), y(y), z(z), type(type), cleared(cleared) {
     }
 
     void print() const {
-        std::cout << "(" << x << "," << y << "): " << type
-            << " | Cleared: " << (cleared ? "Yes" : "No") << "\n";
+        std::cout << "(" << x << "," << y << "," << z << "): " << type << " | Cleared: " << (cleared ? "Yes" : "No") << "\n";
     }
 };
 
@@ -29,7 +28,8 @@ public:
     Map() 
     {
         grid.resize(MAP_SIZE, std::vector<Tile>(MAP_SIZE, Tile(0, 0, "Empty")));
-        for (int i = 0; i < MAP_SIZE; ++i) {
+        for (int i = 0; i < MAP_SIZE; ++i) 
+        {
             for (int j = 0; j < MAP_SIZE; ++j) 
                 grid[i][j] = Tile(i, j, "Empty");
         }
@@ -41,7 +41,8 @@ public:
             grid[x][y].type = type;
     }
 
-    void printMap() const {
+    void printMap() const 
+    {
         for (int i = 0; i < MAP_SIZE; ++i) 
         {
             for (int j = 0; j < MAP_SIZE; ++j) 
@@ -310,7 +311,7 @@ public:
                     else if (tile.type == "Boss") std::cout << " B ";
                     else if (tile.type == "Enemy") std::cout << " E ";
                     else if (tile.type == "Rest") std::cout << " R ";
-                    else if (tile.type == "Exit") std::cout << " L ";
+                    else if (tile.type == "Ladder") std::cout << " L ";
                     else std::cout << " ? "; // fallback
                 }
             }
