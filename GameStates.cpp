@@ -14,23 +14,52 @@ void movePlayer(Player& hero)
 {
     while (true)
     {
-        std::cout << "\nChoose direction (N/S/E/W): ";
-        char dir;
+        std::cout << "\nChoose direction (N/S/E/W/NE/NW/SE/SW): ";
+        std::string dir;
         std::cin >> dir;
         clearInput();
+
+        // Convert input to uppercase
+        for (auto& c : dir) c = std::toupper(c);
+
         int newX = hero.coordinates[0];
         int newY = hero.coordinates[1];
-        switch (toupper(dir)) 
+
+        if (dir == "N") 
+            newY += 1;
+        else if (dir == "S")
+            newY -= 1;
+        else if (dir == "E") 
+            newX += 1;
+        else if (dir == "W") 
+            newX -= 1;
+        else if (dir == "NE") 
         {
-        case 'N': newY += 1; break;
-        case 'S': newY -= 1; break;
-        case 'E': newX += 1; break;
-        case 'W': newX -= 1; break;
-        default:
-            std::cout << "Invalid input. Try N/S/E/W.\n";
+            newX += 1;
+            newY += 1;
+        }
+        else if (dir == "NW") 
+        {
+            newX -= 1;
+            newY += 1;
+        }
+        else if (dir == "SE")
+        {
+            newX += 1;
+            newY -= 1;
+        }
+        else if (dir == "SW") 
+        {
+            newX -= 1;
+            newY -= 1;
+        }
+        else 
+        {
+            std::cout << "Invalid input. Try N/S/E/W/NE/NW/SE/SW.\n";
             continue;
         }
-        if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE) {
+        if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE) 
+        {
             std::cout << "You cannot move off the map.\n";
             continue;
         }
@@ -38,7 +67,7 @@ void movePlayer(Player& hero)
         hero.coordinates[1] = newY;
         break;
     }
-    handlePostMovementEvent();
+    handlePostMovementEvent(hero);
 }
 
 Enemy getEnemyForTile(int location[2])
