@@ -49,6 +49,10 @@ public:
             grid[x][y].type = type;
     }
 
+    Tile& getTile(int x, int y)
+    {
+        return grid.at(x).at(y); // bounds-checked for safety
+    }
     void printMap(const int playerX, const int playerY) const 
     {
         std::cout << "\n=== Map Floor " << z << " ===";

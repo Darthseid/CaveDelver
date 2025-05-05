@@ -6,9 +6,12 @@
 #include <fstream>
 #include "DelverHelpers.h"
 #include "DelverTemplates.h"
-#include "Spells.cpp"
+#include "Spells.h"
 #include <thread>
 #include <chrono>
+#include "MainMenu.h"
+
+extern Cave cave; // Declare global/shared cave instance
 
 void movePlayer(Player& hero)
 {
@@ -19,7 +22,6 @@ void movePlayer(Player& hero)
         std::cin >> dir;
         clearInput();
 
-        // Convert input to uppercase
         for (auto& c : dir) c = std::toupper(c);
 
         int newX = hero.coordinates[0];
@@ -72,9 +74,8 @@ void movePlayer(Player& hero)
 
 Enemy getEnemyForTile(int location[2])  
 {  
-   std::string type = maps[currentMapIndex]  
-       .grid[location[0]][location[1]].type;  
-
+    Tile& tile = cave.getCurrentMap(location[2]).getTile(location[0], location[1]);
+    std::string type = tile.type;
    if (type == "Enemy")  
    {  
        if (currentMapIndex == 0) return goblin;  
@@ -149,10 +150,9 @@ void playerAttack(Enemy& foe, Player& hero)
         std::cout << "You Missed!\n";
 }
 
-void clearTile(int location[2])
+void clearTile(Tile& tile)
 {
-        Tile& tile = maps[currentMapIndex].grid[location[0], location[1]]; //Player's current location.
-        tile.cleared = true;  // Mark the tile as cleared
+        tile.cleared = true; 
 }
 
 void enemyAttack(Enemy& foe, Player& hero)
@@ -224,7 +224,8 @@ void handleCombat(Player& hero, Enemy& foe)
     checkGameOver( hero);
     if (checkDeadEnemy(hero, foe)) //If the enemy is dead.
     {
-        clearTile(hero.coordinates);
+		int location[2] = hero.coordinates;
+        Tile& tile = cave.getCurrentMap(location[2]).getTile(location[0], location[1]);
         overWorld(hero);
     }
 }
@@ -244,7 +245,6 @@ void initiatePlayer()
     p.currentHealth = p.maxHealth;
     p.currentMana = p.maxMana;
 
-    Player = p;  // Assign to global player
     maps[0].generateMap1(); // Generate map 0
     currentMapIndex = 0;
 
@@ -272,7 +272,7 @@ void overWorld(Player& hero)
             movePlayer(hero);
             break;
         case 2:
-            showMap(maps[hero.coordinates[2]]);
+            printMap(maps[hero.coordinates[2]]);
             break;
         case 3:
             if (hero.currentMana < 3) 
@@ -291,7 +291,7 @@ void overWorld(Player& hero)
             break;
         case 4:
             savePlayer(hero);
-            maps[hero.coordinates[2]].saveMap(hero.coordinates[2]);
+            maps[hero.coordinates[2]].saveMap();
             break;
         case 5:
             std::cout << "\n Exiting game...";
@@ -311,7 +311,7 @@ void checkGameOver(Player& hero)
     {
         std::cout << "\nYou have died.";
         std::this_thread::sleep_for(std::chrono::seconds(2));
-        exit(0); // In the future, it sends the player to the main menu.
+        mainMenuLoop();
     }
 }
 
@@ -335,7 +335,7 @@ void checkGameCompletion()
         std::cout << "\nCongratulations, you completed Cave Delver!\n";
         std::cout << "Thanks for playing. Try another build.\n";
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        exit(0);
+        mainMenuLoop();
     }
 }
 

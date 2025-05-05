@@ -8,7 +8,7 @@
 #include <ctime>
 #include <algorithm>
 #include <random>
-#include "Spells.cpp"
+#include "Spells.h"
 #undef min
 #undef max
 
@@ -123,7 +123,7 @@ void savePlayer(const Player& hero)
             << spell.manaCost << '\n'
             << spell.description << '\n';
     }
-    maps[hero.coordinates[2]].saveMap(hero.coordinates[2]);
+    maps[hero.coordinates[2]].saveMap();
     out.close();
     std::cout << "Player saved successfully.\n";
 }

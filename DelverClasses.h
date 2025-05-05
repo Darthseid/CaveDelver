@@ -66,6 +66,7 @@ public:
         for (const auto& spell : spells)
             spell.print();
     }
+
 };
 
 class Enemy 
