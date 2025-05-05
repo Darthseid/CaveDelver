@@ -70,7 +70,7 @@ public:
 
 class Enemy 
 {
-protected:
+public:
     std::string name;
     int health;
     int accuracy;

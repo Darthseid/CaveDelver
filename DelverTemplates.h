@@ -9,7 +9,8 @@ Spell spell_sleep("Sleep", 12, "Target enemy is stunned for 3 turns. 60% chance 
 Spell spell_reflect("Reflect Damage", 15, "Enemy takes mirrored damage. Lasts 4 turns.");
 
 // --- Spell Collection for Player ---
-std::vector<Spell> playerSpells = {
+std::vector<Spell> playerSpells = 
+{
     spell_heal,
     spell_fireball,
     spell_bless,

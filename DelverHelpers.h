@@ -18,6 +18,14 @@
 extern Map maps[5]; // 5 maps
 extern int currentMapIndex;
 
+bool randomChance(int percent)
+{
+    static std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<> dist(1, 100);
+    return dist(gen) <= percent;
+}
+
+
 void clearInput()  // Helper: Clear input stream
 {
     std::cin.clear();

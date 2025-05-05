@@ -70,30 +70,30 @@ void movePlayer(Player& hero)
     handlePostMovementEvent(hero);
 }
 
-Enemy getEnemyForTile(int location[2])
-{
-    std::string type = maps[currentMapIndex]
-        .grid[player.coordinates[0]][player.coordinates[1]].type;
+Enemy getEnemyForTile(int location[2])  
+{  
+   std::string type = maps[currentMapIndex]  
+       .grid[location[0]][location[1]].type;  
 
-        if (type == "Enemy") 
-        {
-            if (currentMapIndex == 0) return goblin;
-            if (currentMapIndex == 1) return orc;
-            if (currentMapIndex == 2) return ogre;
-            if (currentMapIndex == 3) return troll;
-            if (currentMapIndex == 4) return goliath;
-        }
-        else if (type == "Boss")
-        {
-            if (currentMapIndex == 0) return hugeBear;
-            if (currentMapIndex == 1) return golem;
-            if (currentMapIndex == 2) return spider;
-            if (currentMapIndex == 3) return wyvern;
-            if (currentMapIndex == 4) return hydra;
-        }
+   if (type == "Enemy")  
+   {  
+       if (currentMapIndex == 0) return goblin;  
+       if (currentMapIndex == 1) return orc;  
+       if (currentMapIndex == 2) return ogre;  
+       if (currentMapIndex == 3) return troll;  
+       if (currentMapIndex == 4) return goliath;  
+   }  
+   else if (type == "Boss")  
+   {  
+       if (currentMapIndex == 0) return hugeBear;  
+       if (currentMapIndex == 1) return golem;  
+       if (currentMapIndex == 2) return spider;  
+       if (currentMapIndex == 3) return wyvern;  
+       if (currentMapIndex == 4) return hydra;  
+   }  
 
-        std::cerr << "No valid enemy found for combat.\n";
-        return goblin; // default fallback
+   std::cerr << "No valid enemy found for combat.\n";  
+   return goblin; // default fallback  
 }
 
 bool playerGoesFirst(int playerInit, int enemyInit)
@@ -121,7 +121,7 @@ void playerCombatTurn(Player& hero, Enemy& foe)
         if (randomChance(50)) 
         {
             std::cout << "You successfully fled.\n";
-            overWorld();
+            overWorld(hero);
             break;
         }
         else 
@@ -138,8 +138,8 @@ void playerCombatTurn(Player& hero, Enemy& foe)
 
 void playerAttack(Enemy& foe, Player& hero) 
 {
-    int chance = hero.accuracy - foe.evasion();
-    if (RandomChance(chance)) 
+    int chance = hero.accuracy - foe.evasion;
+    if (randomChance(chance)) 
     {
         std::cout << "\n You Hit!";
         foe.health -= hero.damage;
@@ -157,12 +157,12 @@ void clearTile(int location[2])
 
 void enemyAttack(Enemy& foe, Player& hero)
 {
-    int chance = foe.accuracy - hero.evasion();
-    if (RandomChance(chance))
+    int chance = foe.accuracy - hero.evasion;
+    if (randomChance(chance))
     {
         std::cout << "\n You got Hit!";
         hero.currentHealth -= foe.damage;
-        std::cout << "\n You take " << foe.damage << " damage (HP left: " << player.currentHealth << ")";
+        std::cout << "\n You take " << foe.damage << " damage (HP left: " << hero.currentHealth << ")";
     }
     else
         std::cout << foe.name << "\n Missed!";
@@ -184,18 +184,15 @@ void spellMenu(Player& hero, Enemy& foe)
     clearInput();
 
     if (choice == 0) playerCombatTurn(hero, foe); // cancel -> return to combat menu
-    if (choice < 0 || choice > static_cast<int>(player.spells.size())) //Out of bounds int selection.
+    if (choice < 0 || choice > static_cast<int>(hero.spells.size())) //Out of bounds int selection.
     {
         std::cout << "\n Invalid selection.";
         spellMenu(hero, foe); // re-prompt
     }
     Spell& selected = hero.spells[choice - 1];
     if (hero.currentMana < selected.manaCost) 
-    {
         std::cout << "\n Not enough mana to cast " << selected.name << ".";
-        return false;
-    }
-    player.currentMana -= selected.manaCost; // Spend mana
+    hero.currentMana -= selected.manaCost; // Spend mana
     std::cout << "You cast " << selected.name << "!\n";
 
     // TODO: Implement spell effect by name (in next step)
@@ -224,11 +221,11 @@ void handleCombat(Player& hero, Enemy& foe)
         }
         currentRound++;
     }
-    checkGameOver(Player& hero);
-    if (checkDeadEnemy(foe, hero)) //If the enemy is dead.
+    checkGameOver( hero);
+    if (checkDeadEnemy(hero, foe)) //If the enemy is dead.
     {
         clearTile(hero.coordinates);
-        overWorld();
+        overWorld(hero);
     }
 }
 
@@ -251,7 +248,7 @@ void initiatePlayer()
     maps[0].generateMap1(); // Generate map 0
     currentMapIndex = 0;
 
-    std::cout "! Your journey begins...\n";
+    std::cout; "! Your journey begins...\n";
     overWorld(p);
 }
 

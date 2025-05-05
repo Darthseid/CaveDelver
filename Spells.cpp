@@ -45,9 +45,3 @@ else if (selected.name == "Reflect Damage") {
     return std::max(min, std::min(value, max)); // Helper: Clamp within range
 } */
 
-bool randomChance(int percent)
-{
-    static std::mt19937 gen(std::random_device{}());
-    std::uniform_int_distribution<> dist(1, 100);
-    return dist(gen) <= percent;
-}
