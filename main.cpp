@@ -5,6 +5,16 @@
 #include "GameStates.cpp"
 #pragma comment(lib, "winmm.lib") // Link Windows Multimedia library
 using namespace std;
+#include "DelverClasses.h"
+
+
+void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2) // Callback function to handle the end of the first sound
+{
+    if (uMsg == WOM_DONE)
+    {  
+        PlaySoundA("Tide.wav", NULL, SND_FILENAME | SND_LOOP | SND_ASYNC); // Play the second sound on a loop asynchronously
+    }
+}
 
 int main() 
 {

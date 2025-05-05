@@ -50,7 +50,7 @@ void handlePostMovementEvent(Player& hero)
     {
         if (!reached)
         {
-            std::cout << "It's a trap! You take 5 damage!\n";
+            std::cout << "It's a trap! You take 4 damage!\n";
             hero.currentHealth -= 4;
             checkGameOver(hero);
         }
@@ -61,8 +61,8 @@ void handlePostMovementEvent(Player& hero)
         if (!reached) 
         {
             std::cout << "Rest spot! +5 Health and Mana.\n";
-            player.currentHealth = clamp(player.currentHealth + 5, 0, player.maxHealth);
-            player.currentMana = clamp(player.currentMana + 5, 0, player.maxMana);
+            hero.currentHealth = clamp(hero.currentHealth + 5, 0, hero.maxHealth);
+            hero.currentMana = clamp(hero.currentMana + 5, 0, hero.maxMana);
         }
         reached = true;
     }
@@ -71,8 +71,8 @@ void handlePostMovementEvent(Player& hero)
         if (!reached)
         {
             std::cout << "You found a treasure! +2 Damage, +1 Initiative.\n";
-            player.damage += 2;
-            player.initiative += 1;
+            hero.damage += 2;
+            hero.initiative += 1;
         }
         reached = true;
     }
@@ -86,16 +86,16 @@ void handlePostMovementEvent(Player& hero)
         if (toupper(response) == 'Y') 
         {
                 currentMapIndex++;
-                player.coordinates[0] = 0;
-                player.coordinates[1] = 0;
-                player.coordinates[2] += 1;
+                hero.coordinates[0] = 0;
+                hero.coordinates[1] = 0;
+                hero.coordinates[2] += 1;
                 std::cout << "You ascend to map " << (currentMapIndex + 1) << "!\n";
         }
     }
 }
 
 
-void savePlayer(const Player& player) 
+void savePlayer(const Player& hero) 
 {
     std::ofstream out("Player.txt");
     if (!out.is_open()) 
@@ -104,18 +104,18 @@ void savePlayer(const Player& player)
         return;
     }
 
-    out << player.maxHealth << ' ' << player.currentHealth << '\n';
-    out << player.maxMana << ' ' << player.currentMana << '\n';
-    out << player.accuracy << ' ' << player.evasion << ' ' << player.initiative << ' ' << player.damage << '\n';
-    out << player.coordinates[0] << ' ' << player.coordinates[1] << ' ' << player.coordinates[2] << '\n';
-    out << player.spells.size() << '\n';
-    for (const auto& spell : player.spells) 
+    out << hero.maxHealth << ' ' << hero.currentHealth << '\n';
+    out << hero.maxMana << ' ' << hero.currentMana << '\n';
+    out << hero.accuracy << ' ' << hero.evasion << ' ' << hero.initiative << ' ' << hero.damage << '\n';
+    out << hero.coordinates[0] << ' ' << hero.coordinates[1] << ' ' << hero.coordinates[2] << '\n';
+    out << hero.spells.size() << '\n';
+    for (const auto& spell : hero.spells) 
     {
         out << spell.name << '\n'
             << spell.manaCost << '\n'
             << spell.description << '\n';
     }
-    maps[player.coordinates[2]].saveMap(player.coordinates[2]);
+    maps[hero.coordinates[2]].saveMap(hero.coordinates[2]);
     out.close();
     std::cout << "Player saved successfully.\n";
 }
@@ -167,20 +167,22 @@ Player loadPlayer()
     player.coordinates[2] = z;
     player.spells = spells;
 
-    maps[currentMapIndex].loadMap(currentMapIndex);
+    maps[currentMapIndex].loadMap();
     std::cout << "Player loaded: " <<  "\n";
     return player;
 }
 
-void checkLevelUp(Player& player) {
-    int threshold = (player.level * player.level) / 2;
+void checkLevelUp(Player& hero) 
+{
+    int threshold = (hero.level * hero.level) / 2;
 
-    if (player.experience >= threshold) {
+    if (hero.experience >= threshold) 
+    {
         std::cout << "\n*** Level Up! ***\n";
-        player.level++;
-        player.currentHealth = player.maxHealth;
-        player.currentMana = player.maxMana;
-        std::cout << "You are now level " << player.level << "! HP and Mana fully restored.\n";
+        hero.level++;
+        hero.currentHealth = hero.maxHealth;
+        hero.currentMana = hero.maxMana;
+        std::cout << "You are now level " << hero.level << "! HP and Mana fully restored.\n";
 
         std::cout << "Choose a stat to upgrade:\n";
         std::cout << "1. Max Health (+2)\n";
@@ -193,22 +195,23 @@ void checkLevelUp(Player& player) {
         std::cin >> choice;
         clearInput();
 
-        switch (choice) {
+        switch (choice) 
+        {
             case 1:
-                player.maxHealth += 2;
-                std::cout << "Max Health increased to " << player.maxHealth << "\n";
+                hero.maxHealth += 2;
+                std::cout << "Max Health increased to " << hero.maxHealth << "\n";
                 break;
             case 2:
-                player.maxMana += 2;
-                std::cout << "Max Mana increased to " << player.maxMana << "\n";
+                hero.maxMana += 2;
+                std::cout << "Max Mana increased to " << hero.maxMana << "\n";
                 break;
             case 3:
-                player.accuracy += 3;
-                std::cout << "Accuracy increased to " << player.accuracy << "\n";
+                hero.accuracy += 3;
+                std::cout << "Accuracy increased to " << hero.accuracy << "\n";
                 break;
             case 4:
-                player.evasion += 3;
-                std::cout << "Evasion increased to " << player.evasion << "\n";
+                hero.evasion += 3;
+                std::cout << "Evasion increased to " << hero.evasion << "\n";
                 break;
             default:
                 std::cout << "Invalid choice. No stat upgraded.\n";
@@ -216,6 +219,6 @@ void checkLevelUp(Player& player) {
         }
 
         // Recursive re-check if XP still qualifies for another level
-        checkLevelUp(player);
+        checkLevelUp(hero);
     }
 }
