@@ -40,8 +40,4 @@ else if (selected.name == "Reflect Damage") {
     std::cout << "A mirror aura surrounds you! Damage will reflect for 4 turns.\n";
 }
 
-/**int clamp(int value, int min, int max)
-{
-    return std::max(min, std::min(value, max)); // Helper: Clamp within range
-} */
 

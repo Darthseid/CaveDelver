@@ -131,15 +131,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GameStates.cpp" />
+    <ClCompile Include="GameStates.h" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Spells.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
+    <ClCompile Include="Spells.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DelverClasses.h" />
     <ClInclude Include="DelverHelpers.h" />
     <ClInclude Include="DelverMap.h" />
     <ClInclude Include="DelverTemplates.h" />
+    <ClInclude Include="MainMenu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
