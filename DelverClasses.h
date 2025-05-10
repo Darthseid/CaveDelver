@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#pragma once
+
 
 // --- Spell Class ---
 class Spell 
@@ -34,22 +36,24 @@ public:
     int damage;
     int experience;
     int level;
-    int coordinates[2]; // [x, y, z]
+    int coordinates[3]; // [x, y, z]
     std::vector<Spell> spells;
 
     Player(int maxHealth, int maxMana,
         int accuracy, int evasion,
         int initiative, int damage,
-        int x = 0, int y = 0, int experience, int level)
+        int x = 0, int y = 0, int z = 0,
+        int experience = 0, int level = 1)
         : maxHealth(maxHealth), currentHealth(maxHealth),
         maxMana(maxMana), currentMana(maxMana),
         accuracy(accuracy), evasion(evasion),
-        initiative(initiative), damage(damage), experience(experience), level(level)
+        initiative(initiative), damage(damage),
+        experience(experience), level(level)
     {
         coordinates[0] = x;
         coordinates[1] = y;
+        coordinates[2] = z;
     }
-
     void addSpell(const Spell& spell)
     {
         spells.push_back(spell);

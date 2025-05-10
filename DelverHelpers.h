@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <algorithm> // Add this include at the top of the file for std::clamp
 #include <limits>
 #include "DelverClasses.h"
 #include "DelverMap.h"
@@ -9,7 +10,6 @@
 #include <algorithm>
 #include <random>
 #include "Spells.h"
-#include "../Sample-Test1/utils.h"
 #undef min
 #undef max
 
@@ -72,6 +72,7 @@ void handlePostMovementEvent(Player hero)
             std::cout << "Rest spot! +5 Health and Mana.\n";
             hero.currentHealth = clamp(hero.currentHealth + 5, 0, hero.maxHealth);
             hero.currentMana = clamp(hero.currentMana + 5, 0, hero.maxMana);
+           
         }
         reached = true;
     }
@@ -104,7 +105,7 @@ void handlePostMovementEvent(Player hero)
 }
 
 
-void savePlayer(Player hero) 
+void savePlayer(const Player& hero) 
 {
     std::ofstream out("Player.txt");
     if (!out.is_open()) 
