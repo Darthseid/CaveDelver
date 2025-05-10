@@ -1,4 +1,4 @@
-if (selected.name == "Heal") {
+/** if (selected.name == "Heal") {
     int missing = player.maxHealth - player.currentHealth;
     int healAmount = missing / 2;
     player.currentHealth += healAmount;
@@ -39,5 +39,7 @@ else if (selected.name == "Reflect Damage") {
     player.reflectTurns = 4;
     std::cout << "A mirror aura surrounds you! Damage will reflect for 4 turns.\n";
 }
+
+*/
 
 

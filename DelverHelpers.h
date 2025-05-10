@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <random>
 #include "Spells.h"
+#include "../Sample-Test1/utils.h"
 #undef min
 #undef max
 
@@ -32,7 +33,7 @@ void clearInput()  // Helper: Clear input stream
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-void handlePostMovementEvent(Player& hero)
+void handlePostMovementEvent(Player hero)
 {
     Tile& tile = maps[currentMapIndex].grid[hero.coordinates[0]][hero.coordinates[1]];
     std::string& type = tile.type; // Post-movement event handler
@@ -103,7 +104,7 @@ void handlePostMovementEvent(Player& hero)
 }
 
 
-void savePlayer(Player& hero) 
+void savePlayer(Player hero) 
 {
     std::ofstream out("Player.txt");
     if (!out.is_open()) 
@@ -131,7 +132,8 @@ void savePlayer(Player& hero)
 Player loadPlayer() 
 {
     std::ifstream in("Player.txt");
-    if (!in.is_open()) {
+    if (!in.is_open()) 
+    {
         std::cerr << "Error: Could not open Player.txt\n"; // Load Player from "Player.txt"
         exit(1);
     }
