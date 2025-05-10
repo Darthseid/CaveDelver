@@ -2,19 +2,16 @@
 #include <string>
 #include <algorithm> // Add this include at the top of the file for std::clamp
 #include <limits>
-#include "DelverClasses.h"
-#include "DelverMap.h"
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
-#include <algorithm>
 #include <random>
 #include "Spells.h"
+#include "DelverClasses.h"
+#include "DelverMap.h"
+#pragma once
 #undef min
 #undef max
-
-
-
 
 extern Map maps[5]; // 5 maps
 extern int currentMapIndex;
@@ -26,82 +23,15 @@ bool randomChance(int percent)
     return dist(gen) <= percent;
 }
 
+int clamp(int value, int min, int max)
+{
+	return std::max(min, std::min(value, max)); // Clamp value between min and max
+}
 
 void clearInput()  // Helper: Clear input stream
 {
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-
-void handlePostMovementEvent(Player hero)
-{
-    Tile& tile = maps[currentMapIndex].grid[hero.coordinates[0]][hero.coordinates[1]];
-    std::string& type = tile.type; // Post-movement event handler
-    bool reached = tile.cleared;
-    int hp = hero.currentHealth;
-
-    std::cout << "\n You stepped on: " << type << "";
-
-    if (type == "Empty") 
-    {
-        reached = true;
-    }
-    else if (type == "Enemy" || type == "Boss")
-    {
-        if (!reached)
-        {
-        std::cout << "Combat begins!\n";
-        Enemy foe = getEnemyForTile(hero.coordinates);
-        handleCombat(hero, foe);
-        }
-    }
-    else if (type == "Trap") 
-    {
-        if (!reached)
-        {
-            std::cout << "It's a trap! You take 4 damage!\n";
-            hero.currentHealth -= 4;
-            checkGameOver(hero);
-        }
-        reached = true;
-    }
-    else if (type == "Rest") 
-    {
-        if (!reached) 
-        {
-            std::cout << "Rest spot! +5 Health and Mana.\n";
-            hero.currentHealth = clamp(hero.currentHealth + 5, 0, hero.maxHealth);
-            hero.currentMana = clamp(hero.currentMana + 5, 0, hero.maxMana);
-           
-        }
-        reached = true;
-    }
-    else if (type == "Treasure") 
-    {
-        if (!reached)
-        {
-            std::cout << "You found a treasure! +2 Damage, +1 Initiative.\n";
-            hero.damage += 2;
-            hero.initiative += 1;
-        }
-        reached = true;
-    }
-    else if (type == "Ladder") 
-    {
-        std::cout << "You've found the ladder. Ascend to next floor? (Y/N): ";
-        char response;
-        std::cin >> response;
-        clearInput();
-        reached = true;
-        if (toupper(response) == 'Y') 
-        {
-                currentMapIndex++;
-                hero.coordinates[0] = 0;
-                hero.coordinates[1] = 0;
-                hero.coordinates[2] += 1;
-                std::cout << "You ascend to map " << (currentMapIndex + 1) << "!\n";
-        }
-    }
 }
 
 
@@ -228,8 +158,6 @@ void checkLevelUp(Player& hero)
                 std::cout << "Invalid choice. No stat upgraded.\n";
                 break;
         }
-
-        // Recursive re-check if XP still qualifies for another level
-        checkLevelUp(hero);
+        checkLevelUp(hero); // Recursive re-check if XP still qualifies for another level
     }
 }

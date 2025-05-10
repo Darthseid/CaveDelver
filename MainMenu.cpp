@@ -1,5 +1,6 @@
 #include "MainMenu.h"   // Include the corresponding header
 #include "GameStates.h" // Include header for initiatePlayer, loadPlayer declarations
+#include "DelverHelpers.h"
 #include <iostream>
 #include <limits>   // For std::numeric_limits
 #include <ios>      // For std::streamsize

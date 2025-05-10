@@ -1,158 +1,35 @@
 #include <iostream>
 #include <string>
 #include <limits>
-#include "DelverClasses.h"
-#include "DelverMap.h"
 #include <fstream>
-#include "DelverHelpers.h"
-#include "DelverTemplates.h"
-#include "Spells.h"
 #include <thread>
 #include <chrono>
 #include "MainMenu.h"
+#include "DelverClasses.h"
+#include "DelverMap.h"
+#include "DelverTemplates.h"
+#include "Spells.h"
+#include "DelverHelpers.h"
+#pragma once
 
 extern Cave cave; // Declare global/shared cave instance
 
-void movePlayer(Player& hero)
-{
-    while (true)
-    {
-        std::cout << "\nChoose direction (N/S/E/W/NE/NW/SE/SW): ";
-        std::string dir;
-        std::cin >> dir;
-        clearInput();
-
-        for (auto& c : dir) c = std::toupper(c);
-
-        int newX = hero.coordinates[0];
-        int newY = hero.coordinates[1];
-
-        if (dir == "N") 
-            newY += 1;
-        else if (dir == "S")
-            newY -= 1;
-        else if (dir == "E") 
-            newX += 1;
-        else if (dir == "W") 
-            newX -= 1;
-        else if (dir == "NE") 
-        {
-            newX += 1;
-            newY += 1;
-        }
-        else if (dir == "NW") 
-        {
-            newX -= 1;
-            newY += 1;
-        }
-        else if (dir == "SE")
-        {
-            newX += 1;
-            newY -= 1;
-        }
-        else if (dir == "SW") 
-        {
-            newX -= 1;
-            newY -= 1;
-        }
-        else 
-        {
-            std::cout << "Invalid input. Try N/S/E/W/NE/NW/SE/SW.\n";
-            continue;
-        }
-        if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE) 
-        {
-            std::cout << "You cannot move off the map.\n";
-            continue;
-        }
-        hero.coordinates[0] = newX;
-        hero.coordinates[1] = newY;
-        break;
-    }
-    handlePostMovementEvent(hero);
-}
-
-Enemy getEnemyForTile(int location[2])  
-{  
-    Tile& tile = cave.getCurrentMap(location[2]).getTile(location[0], location[1]);
-    std::string type = tile.type;
-   if (type == "Enemy")  
-   {  
-       if (currentMapIndex == 0) return goblin;  
-       if (currentMapIndex == 1) return orc;  
-       if (currentMapIndex == 2) return ogre;  
-       if (currentMapIndex == 3) return troll;  
-       if (currentMapIndex == 4) return goliath;  
-   }  
-   else if (type == "Boss")  
-   {  
-       if (currentMapIndex == 0) return hugeBear;  
-       if (currentMapIndex == 1) return golem;  
-       if (currentMapIndex == 2) return spider;  
-       if (currentMapIndex == 3) return wyvern;  
-       if (currentMapIndex == 4) return hydra;  
-   }  
-
-   std::cerr << "No valid enemy found for combat.\n";  
-   return goblin; // default fallback  
-}
-
-bool playerGoesFirst(int playerInit, int enemyInit)
-{
-    if (playerInit > enemyInit) return true;
-    if (enemyInit > playerInit) return false;
-    return randomChance(50); // initiative tie
-}
-
-void playerCombatTurn(Player& hero, Enemy& foe) 
-{
-    std::cout << "\nChoose Action: [A]ttack, [M]agic, [F]lee: ";
-    char choice;
-    std::cin >> choice;
-    clearInput();
-    switch (toupper(choice)) 
-    {
-    case 'A':
-        playerAttack(foe, hero);
-        break;
-    case 'M':
-        spellMenu(hero, foe);
-        break;
-    case 'F':
-        if (randomChance(50)) 
-        {
-            std::cout << "You successfully fled.\n";
-            overWorld(hero);
-            break;
-        }
-        else 
-        {
-            std::cout << "Flee failed! The enemy attacks!\n";
-            enemyAttack(foe, hero);
-            break;
-        }
-    default:
-        std::cout << "Invalid choice. Try again.\n";
-        playerCombatTurn(hero, foe); //re-prompt
-    }
-}
-
-void playerAttack(Enemy& foe, Player& hero) 
+void playerAttack(Enemy& foe, Player& hero)
 {
     int chance = hero.accuracy - foe.evasion;
-    if (randomChance(chance)) 
+    if (randomChance(chance))
     {
         std::cout << "\n You Hit!";
         foe.health -= hero.damage;
         std::cout << "\n" << foe.name << " takes " << hero.damage << " damage (HP left: " << foe.health << ")";
     }
-    else 
+    else
         std::cout << "You Missed!\n";
 }
 
 void clearTile(Tile& tile)
 {
-        tile.cleared = true; 
+    tile.cleared = true;
 }
 
 void enemyAttack(Enemy& foe, Player& hero)
@@ -168,7 +45,98 @@ void enemyAttack(Enemy& foe, Player& hero)
         std::cout << foe.name << "\n Missed!";
 }
 
-void spellMenu(Player& hero, Enemy& foe) 
+Enemy getEnemyForTile(int location[2])
+{
+    Tile& tile = cave.getCurrentMap(location[2]).getTile(location[0], location[1]);
+    std::string type = tile.type;
+    if (type == "Enemy")
+    {
+        if (currentMapIndex == 0) return goblin;
+        if (currentMapIndex == 1) return orc;
+        if (currentMapIndex == 2) return ogre;
+        if (currentMapIndex == 3) return troll;
+        if (currentMapIndex == 4) return goliath;
+    }
+    else if (type == "Boss")
+    {
+        if (currentMapIndex == 0) return hugeBear;
+        if (currentMapIndex == 1) return golem;
+        if (currentMapIndex == 2) return spider;
+        if (currentMapIndex == 3) return wyvern;
+        if (currentMapIndex == 4) return hydra;
+    }
+
+    std::cerr << "No valid enemy found for combat.\n";
+    return goblin; // default fallback  
+}
+
+void checkGameOver(Player& hero)
+{
+    if (hero.currentHealth <= 0)
+    {
+        std::cout << "\nYou have died.";
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        mainMenuLoop();
+    }
+}
+
+bool checkDeadEnemy(Player& hero, Enemy& foe) // Added '&' to refer to the original enemy object.
+{
+    if (foe.health <= 0) // Dead enemy.
+    {
+        std::cout << "\n" << foe.name << " has been defeated.";
+        hero.experience += foe.bounty;
+        std::cout << "\nYou gain " << foe.bounty << " Experience Points."; // Fixed concatenation and formatting.
+        return true;
+    }
+    return false; // This means the enemy is still alive.
+}
+
+
+bool playerGoesFirst(int playerInit, int enemyInit)
+{
+    if (playerInit > enemyInit) return true;
+    if (enemyInit > playerInit) return false;
+    return randomChance(50); // initiative tie
+}
+
+void overWorld(Player& hero);
+void spellMenu(Player& hero, Enemy& foe);
+
+void playerCombatTurn(Player& hero, Enemy& foe)
+{
+    std::cout << "\nChoose Action: [A]ttack, [M]agic, [F]lee: ";
+    char choice;
+    std::cin >> choice;
+    clearInput();
+    switch (toupper(choice))
+    {
+    case 'A':
+        playerAttack(foe, hero);
+        break;
+    case 'M':
+        spellMenu(hero, foe);
+        break;
+    case 'F':
+        if (randomChance(50))
+        {
+            std::cout << "You successfully fled.\n";
+            overWorld(hero);
+            break;
+        }
+        else
+        {
+            std::cout << "Flee failed! The enemy attacks!\n";
+            enemyAttack(foe, hero);
+            break;
+        }
+    default:
+        std::cout << "Invalid choice. Try again.\n";
+        playerCombatTurn(hero, foe); //re-prompt
+    }
+}
+
+void spellMenu(Player& hero, Enemy& foe)
 {
     std::cout << "\n=== Spellbook ===";
     for (size_t i = 0; i < hero.spells.size(); ++i)
@@ -190,7 +158,7 @@ void spellMenu(Player& hero, Enemy& foe)
         spellMenu(hero, foe); // re-prompt
     }
     Spell& selected = hero.spells[choice - 1];
-    if (hero.currentMana < selected.manaCost) 
+    if (hero.currentMana < selected.manaCost)
         std::cout << "\n Not enough mana to cast " << selected.name << ".";
     hero.currentMana -= selected.manaCost; // Spend mana
     std::cout << "You cast " << selected.name << "!\n";
@@ -200,20 +168,21 @@ void spellMenu(Player& hero, Enemy& foe)
     std::cout << "The spell effect takes place.\n";
 }
 
-void handleCombat(Player& hero, Enemy& foe) 
+
+void handleCombat(Player& hero, Enemy& foe)
 { //Handle Player fleeing logic.
     int currentRound = 1;
     bool playerAttacksFirst = playerGoesFirst(hero.initiative, foe.initiative);
     while (hero.currentHealth > 0 && foe.health > 0)
     {
         std::cout << "\n Round " << currentRound << std::endl;
-        if (playerAttacksFirst) 
+        if (playerAttacksFirst)
         {
             playerCombatTurn(hero, foe); // Includes attack flow
-            if (foe.health > 0) 
+            if (foe.health > 0)
                 enemyAttack(foe, hero); // Enemy attacks back
         }
-        else 
+        else
         {
             enemyAttack(foe, hero); // Enemy attacks first
             if (hero.currentHealth > 0)
@@ -221,7 +190,7 @@ void handleCombat(Player& hero, Enemy& foe)
         }
         currentRound++;
     }
-    checkGameOver( hero);
+    checkGameOver(hero);
     if (checkDeadEnemy(hero, foe)) // If the enemy is dead
     {
         int x = hero.coordinates[0];
@@ -256,6 +225,149 @@ void initiatePlayer()
 
     std::cout << "! Your journey begins...\n";
     overWorld(p);
+}
+
+
+void checkGameCompletion()
+{
+    Tile& bossTile = maps[4].grid[8][7]; // Assuming boss is always at (8,7) on map 4
+    if (bossTile.type == "Boss" && bossTile.cleared)
+    {
+        std::cout << "\nCongratulations, you completed Cave Delver!\n";
+        std::cout << "Thanks for playing. Try another build.\n";
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        mainMenuLoop();
+    }
+}
+
+void handlePostMovementEvent(Player hero)
+{
+    Tile& tile = maps[currentMapIndex].grid[hero.coordinates[0]][hero.coordinates[1]];
+    std::string& type = tile.type; // Post-movement event handler
+    bool reached = tile.cleared;
+    int hp = hero.currentHealth;
+
+    std::cout << "\n You stepped on: " << type << "";
+
+    if (type == "Empty")
+    {
+        reached = true;
+    }
+    else if (type == "Enemy" || type == "Boss")
+    {
+        if (!reached)
+        {
+            std::cout << "Combat begins!\n";
+            Enemy foe = getEnemyForTile(hero.coordinates);
+            handleCombat(hero, foe);
+        }
+    }
+    else if (type == "Trap")
+    {
+        if (!reached)
+        {
+            std::cout << "It's a trap! You take 4 damage!\n";
+            hero.currentHealth -= 4;
+            checkGameOver(hero);
+        }
+        reached = true;
+    }
+    else if (type == "Rest")
+    {
+        if (!reached)
+        {
+            std::cout << "Rest spot! +5 Health and Mana.\n";
+            hero.currentHealth = clamp(hero.currentHealth + 5, 0, hero.maxHealth);
+            hero.currentMana = clamp(hero.currentMana + 5, 0, hero.maxMana);
+
+        }
+        reached = true;
+    }
+    else if (type == "Treasure")
+    {
+        if (!reached)
+        {
+            std::cout << "You found a treasure! +2 Damage, +1 Initiative.\n";
+            hero.damage += 2;
+            hero.initiative += 1;
+        }
+        reached = true;
+    }
+    else if (type == "Ladder")
+    {
+        std::cout << "You've found the ladder. Ascend to next floor? (Y/N): ";
+        char response;
+        std::cin >> response;
+        clearInput();
+        reached = true;
+        if (toupper(response) == 'Y')
+        {
+            currentMapIndex++;
+            hero.coordinates[0] = 0;
+            hero.coordinates[1] = 0;
+            hero.coordinates[2] += 1;
+            std::cout << "You ascend to map " << (currentMapIndex + 1) << "!\n";
+        }
+    }
+}
+
+void movePlayer(Player& hero)
+{
+    while (true)
+    {
+        std::cout << "\nChoose direction (N/S/E/W/NE/NW/SE/SW): ";
+        std::string dir;
+        std::cin >> dir;
+        clearInput();
+
+        for (auto& c : dir) c = std::toupper(c);
+
+        int newX = hero.coordinates[0];
+        int newY = hero.coordinates[1];
+
+        if (dir == "N")
+            newY += 1;
+        else if (dir == "S")
+            newY -= 1;
+        else if (dir == "E")
+            newX += 1;
+        else if (dir == "W")
+            newX -= 1;
+        else if (dir == "NE")
+        {
+            newX += 1;
+            newY += 1;
+        }
+        else if (dir == "NW")
+        {
+            newX -= 1;
+            newY += 1;
+        }
+        else if (dir == "SE")
+        {
+            newX += 1;
+            newY -= 1;
+        }
+        else if (dir == "SW")
+        {
+            newX -= 1;
+            newY -= 1;
+        }
+        else
+        {
+            std::cout << "Invalid input. Try N/S/E/W/NE/NW/SE/SW.\n";
+            continue;
+        }
+        if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE)
+        {
+            std::cout << "You cannot move off the map.\n";
+            continue;
+        }
+        hero.coordinates[0] = newX;
+        hero.coordinates[1] = newY;
+        break;
+    }
+    handlePostMovementEvent(hero);
 }
 
 void overWorld(Player& hero)
@@ -312,38 +424,3 @@ void overWorld(Player& hero)
         }
     }
 }
-void checkGameOver(Player& hero)
-{
-    if (hero.currentHealth <= 0)
-    {
-        std::cout << "\nYou have died.";
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        mainMenuLoop();
-    }
-}
-
-bool checkDeadEnemy(Player& hero, Enemy& foe) // Added '&' to refer to the original enemy object.
-{
-    if (foe.health <= 0) // Dead enemy.
-    {
-        std::cout << "\n" << foe.name << " has been defeated.";
-        hero.experience += foe.bounty;
-        std::cout << "\nYou gain " << foe.bounty << " Experience Points."; // Fixed concatenation and formatting.
-        return true;
-    }
-    return false; // This means the enemy is still alive.
-}
-
-void checkGameCompletion() 
-{
-    Tile& bossTile = maps[4].grid[8][7]; // Assuming boss is always at (8,7) on map 4
-    if (bossTile.type == "Boss" && bossTile.cleared) 
-    {
-        std::cout << "\nCongratulations, you completed Cave Delver!\n";
-        std::cout << "Thanks for playing. Try another build.\n";
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        mainMenuLoop();
-    }
-}
-
-
