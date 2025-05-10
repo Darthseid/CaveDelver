@@ -116,12 +116,12 @@ public:
         }
         in.close();
     }
-    void generateMap1(Map& map)
+    void generateMap1()
     {
         int x = 0, y = 9;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Rest");
+            setTile(x, y, "Rest");
             y += 9;
             if (y >= 10) 
             {
@@ -132,7 +132,7 @@ public:
         x = 0, y = 5;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Enemy");
+            setTile(x, y, "Enemy");
             y += 5;
             if (y >= 10) 
             {
@@ -140,24 +140,24 @@ public:
                 x++;
             }
         }
-        map.setTile(4, 7, "Enemy");
-        map.setTile(1, 1, "Rest");
-        map.setTile(9, 7, "Trap");
-        map.setTile(7, 7, "Trap");
-        map.setTile(8, 6, "Trap");
-        map.setTile(8, 8, "Trap");
-        map.setTile(0, 6, "Trap");
+        setTile(4, 7, "Enemy");
+        setTile(1, 1, "Rest");
+        setTile(9, 7, "Trap");
+        setTile(7, 7, "Trap");
+        setTile(8, 6, "Trap");
+        setTile(8, 8, "Trap");
+        setTile(0, 6, "Trap");
 
-        map.setTile(9, 2, "Treasure");
-        map.setTile(8, 7, "Boss");
-        map.setTile(8, 9, "Ladder");
+        setTile(9, 2, "Treasure");
+        setTile(8, 7, "Boss");
+        setTile(8, 9, "Ladder");
     }
-    void generateMap2(Map& map)
+    void generateMap2()
     {
         int x = 0, y = 8;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Rest");
+            setTile(x, y, "Rest");
             y += 9;
             if (y >= 10) 
             {
@@ -168,7 +168,7 @@ public:
         x = 0, y = 4;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Enemy");
+            setTile(x, y, "Enemy");
             y += 5;
             if (y >= 10) 
             {
@@ -176,25 +176,25 @@ public:
                 x++;
             }
         }
-        map.setTile(4, 8, "Rest");
-        map.setTile(2, 1, "Rest");
+        setTile(4, 8, "Rest");
+        setTile(2, 1, "Rest");
 
-        map.setTile(5, 2, "Trap");
-        map.setTile(3, 1, "Trap");
-        map.setTile(9, 9, "Trap");
-        map.setTile(0, 9, "Trap");
-        map.setTile(0, 1, "Trap");
+        setTile(5, 2, "Trap");
+        setTile(3, 1, "Trap");
+        setTile(9, 9, "Trap");
+        setTile(0, 9, "Trap");
+        setTile(0, 1, "Trap");
 
-        map.setTile(5, 5, "Treasure");
-        map.setTile(7, 9, "Boss");
-        map.setTile(9, 5, "Ladder");
+        setTile(5, 5, "Treasure");
+        setTile(7, 9, "Boss");
+        setTile(9, 5, "Ladder");
     }
-    void generateMap3(Map& map)
+    void generateMap3()
     {
         int x = 0, y = 7;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Rest");
+            setTile(x, y, "Rest");
             y += 9;
             if (y >= 10)
             {
@@ -205,7 +205,7 @@ public:
         x = 0, y = 3;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Enemy");
+            setTile(x, y, "Enemy");
             y += 5;
             if (y >= 10)
             {
@@ -213,25 +213,25 @@ public:
                 x++;
             }
         }
-        map.setTile(3, 1, "Rest");
-        map.setTile(5, 1, "Rest");
+        setTile(3, 1, "Rest");
+        setTile(5, 1, "Rest");
 
-        map.setTile(7, 1, "Trap");
-        map.setTile(3, 9, "Trap");
-        map.setTile(9, 7, "Trap");
-        map.setTile(0, 9, "Trap");
-        map.setTile(1, 0, "Trap");
+        setTile(7, 1, "Trap");
+        setTile(3, 9, "Trap");
+        setTile(9, 7, "Trap");
+        setTile(0, 9, "Trap");
+        setTile(1, 0, "Trap");
 
-        map.setTile(5, 4, "Treasure");
-        map.setTile(7, 2, "Boss");
-        map.setTile(8, 5, "Ladder");
+        setTile(5, 4, "Treasure");
+        setTile(7, 2, "Boss");
+        setTile(8, 5, "Ladder");
     }
-    void generateMap4(Map& map)
+    void generateMap4()
     {
         int x = 0, y = 6;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Rest");
+            setTile(x, y, "Rest");
             y += 9;
             if (y >= 10)
             {
@@ -242,7 +242,7 @@ public:
         x = 0, y = 2;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Enemy");
+            setTile(x, y, "Enemy");
             y += 5;
             if (y >= 10)
             {
@@ -250,25 +250,25 @@ public:
                 x++;
             }
         }
-        map.setTile(3, 1, "Rest");
-        map.setTile(5, 1, "Rest");
+        setTile(3, 1, "Rest");
+        setTile(5, 1, "Rest");
 
-        map.setTile(6, 3, "Trap");
-        map.setTile(3, 8, "Trap");
-        map.setTile(4, 3, "Trap");
-        map.setTile(8, 6, "Trap");
-        map.setTile(9, 0, "Trap");
+        setTile(6, 3, "Trap");
+        setTile(3, 8, "Trap");
+        setTile(4, 3, "Trap");
+        setTile(8, 6, "Trap");
+        setTile(9, 0, "Trap");
 
-        map.setTile(3, 4, "Treasure");
-        map.setTile(0, 9, "Boss");
-        map.setTile(5, 2, "Ladder");
+        setTile(3, 4, "Treasure");
+        setTile(0, 9, "Boss");
+        setTile(5, 2, "Ladder");
     }
-    void generateMap5(Map& map)
+    void generateMap5()
     {
         int x = 0, y = 5;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Rest");
+            setTile(x, y, "Rest");
             y += 9;
             if (y >= 10)
             {
@@ -279,7 +279,7 @@ public:
         x = 0, y = 1;
         while (x < MAP_SIZE)
         {
-            map.setTile(x, y, "Enemy");
+            setTile(x, y, "Enemy");
             y += 5;
             if (y >= 10)
             {
@@ -287,17 +287,17 @@ public:
                 x++;
             }
         }
-        map.setTile(3, 3, "Rest");
-        map.setTile(4, 4, "Rest");
+        setTile(3, 3, "Rest");
+        setTile(4, 4, "Rest");
 
-        map.setTile(6, 3, "Trap");
-        map.setTile(3, 8, "Trap");
-        map.setTile(2, 2, "Trap");
-        map.setTile(7, 5, "Trap");
-        map.setTile(9, 3, "Trap");
+        setTile(6, 3, "Trap");
+        setTile(3, 8, "Trap");
+        setTile(2, 2, "Trap");
+        setTile(7, 5, "Trap");
+        setTile(9, 3, "Trap");
 
-        map.setTile(8, 9, "Treasure");
-        map.setTile(9, 9, "Boss"); //No ladder on final map.
+        setTile(8, 9, "Treasure");
+        setTile(9, 9, "Boss"); //No ladder on final map.
     }
 };
 

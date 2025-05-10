@@ -103,7 +103,7 @@ void handlePostMovementEvent(Player& hero)
 }
 
 
-void savePlayer(const Player& hero) 
+void savePlayer(Player& hero) 
 {
     std::ofstream out("Player.txt");
     if (!out.is_open()) 

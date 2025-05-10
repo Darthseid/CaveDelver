@@ -222,17 +222,18 @@ void handleCombat(Player& hero, Enemy& foe)
         currentRound++;
     }
     checkGameOver( hero);
-    if (checkDeadEnemy(hero, foe)) //If the enemy is dead.
+    if (checkDeadEnemy(hero, foe)) // If the enemy is dead
     {
-		int location[2] = hero.coordinates;
-        Tile& tile = cave.getCurrentMap(location[2]).getTile(location[0], location[1]);
+        int x = hero.coordinates[0];
+        int y = hero.coordinates[1];
+        int z = hero.coordinates[2];
+        Tile& tile = cave.getCurrentMap(z).getTile(x, y);
         overWorld(hero);
     }
 }
 
-void initiatePlayer() 
+void initiatePlayer()
 {
-    // Create player with default starting stats
     Player p(
         6,     // maxHealth
         3,     // maxMana
@@ -240,19 +241,24 @@ void initiatePlayer()
         0,     // evasion
         1,     // initiative
         2,     // damage
-        0, 0, 0); // start position x=0, y=0
+        0, 0, 0 // starting coordinates x, y, z
+    );
 
     p.currentHealth = p.maxHealth;
     p.currentMana = p.maxMana;
 
-    maps[0].generateMap1(); // Generate map 0
-    currentMapIndex = 0;
+    // Generate maps via map reference
+    cave.getCurrentMap(0).generateMap1();
+    cave.getCurrentMap(1).generateMap2();
+    cave.getCurrentMap(2).generateMap3();
+    cave.getCurrentMap(3).generateMap4();
+    cave.getCurrentMap(4).generateMap5();
 
-    std::cout; "! Your journey begins...\n";
+    std::cout << "! Your journey begins...\n";
     overWorld(p);
 }
 
-void overWorld(Player& hero) 
+void overWorld(Player& hero)
 {
     while (true)
     {
@@ -266,20 +272,23 @@ void overWorld(Player& hero)
         int choice;
         std::cin >> choice;
         clearInput();
+
         switch (choice)
         {
         case 1:
             movePlayer(hero);
             break;
+
         case 2:
-            printMap(maps[hero.coordinates[2]]);
+            cave.getCurrentMap(hero.coordinates[2]).printMap(hero.coordinates[0], hero.coordinates[1]);
             break;
+
         case 3:
-            if (hero.currentMana < 3) 
+            if (hero.currentMana < 3)
             {
                 std::cout << "Not enough mana to heal.\n";
             }
-            else 
+            else
             {
                 int missing = hero.maxHealth - hero.currentHealth;
                 int healAmount = missing / 2;
@@ -291,20 +300,18 @@ void overWorld(Player& hero)
             break;
         case 4:
             savePlayer(hero);
-            maps[hero.coordinates[2]].saveMap();
+            cave.getCurrentMap(hero.coordinates[2]).saveMap();
             break;
         case 5:
-            std::cout << "\n Exiting game...";
+            std::cout << "\nExiting game...";
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             exit(0);
         default:
-            std::cout << "\n Invalid option. Try again.";
+            std::cout << "\nInvalid option. Try again.\n";
             break;
         }
     }
 }
-
-
 void checkGameOver(Player& hero)
 {
     if (hero.currentHealth <= 0)
