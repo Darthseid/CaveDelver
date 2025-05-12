@@ -1,6 +1,7 @@
 // --- Spells ---
 #include <vector>
 #include "DelverClasses.h"
+#pragma once
 
 Spell spell_heal("Heal", 3, "Player recovers 50% of Missing Health.");
 Spell spell_fireball("Fireball", 6, "Player deals 7 Damage to Enemy");

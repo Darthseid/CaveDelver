@@ -13,22 +13,22 @@
 #undef min
 #undef max
 
-extern Map maps[5]; // 5 maps
-extern int currentMapIndex;
 
-bool randomChance(int percent)
+Cave cave; 
+
+inline bool randomChance(int percent)
 {
     static std::mt19937 gen(std::random_device{}());
     std::uniform_int_distribution<> dist(1, 100);
     return dist(gen) <= percent;
 }
 
-int clamp(int value, int min, int max)
+inline int clamp(int value, int min, int max)
 {
 	return std::max(min, std::min(value, max)); // Clamp value between min and max
 }
 
-void clearInput()  // Helper: Clear input stream
+inline void clearInput()  // Helper: Clear input stream
 {
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -55,7 +55,7 @@ void savePlayer(const Player& hero)
             << spell.manaCost << '\n'
             << spell.description << '\n';
     }
-    maps[hero.coordinates[2]].saveMap();
+    cave.getCurrentMap(hero.coordinates[2]).saveMap();
     out.close();
     std::cout << "Player saved successfully.\n";
 }
@@ -108,7 +108,7 @@ Player loadPlayer()
     player.coordinates[2] = z;
     player.spells = spells;
 
-    maps[currentMapIndex].loadMap();
+    cave.getCurrentMap(z).loadMap();  // use `z` from loaded player coordinates
     std::cout << "Player loaded: " <<  "\n";
     return player;
 }

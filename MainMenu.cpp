@@ -4,6 +4,7 @@
 #include <iostream>
 #include <limits>   // For std::numeric_limits
 #include <ios>      // For std::streamsize
+#pragma once
 
 
 void mainMenuLoop()  // Definition of the main menu loop function

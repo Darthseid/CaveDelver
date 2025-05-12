@@ -12,7 +12,8 @@
 #include "DelverHelpers.h"
 #pragma once
 
-extern Cave cave; // Declare global/shared cave instance
+
+Cave cave; // Define the global variable here
 
 void playerAttack(Enemy& foe, Player& hero)
 {
@@ -45,30 +46,33 @@ void enemyAttack(Enemy& foe, Player& hero)
         std::cout << foe.name << "\n Missed!";
 }
 
-Enemy getEnemyForTile(int location[2])
+Enemy getEnemyForTile(int location[3])
 {
-    Tile& tile = cave.getCurrentMap(location[2]).getTile(location[0], location[1]);
-    std::string type = tile.type;
+    int x = location[0];
+    int y = location[1];
+    int z = location[2];
+    Tile& tile = cave.getCurrentMap(z).getTile(x, y);
+    const std::string& type = tile.type;
     if (type == "Enemy")
     {
-        if (currentMapIndex == 0) return goblin;
-        if (currentMapIndex == 1) return orc;
-        if (currentMapIndex == 2) return ogre;
-        if (currentMapIndex == 3) return troll;
-        if (currentMapIndex == 4) return goliath;
+        if (z == 0) return goblin;
+        if (z == 1) return orc;
+        if (z == 2) return ogre;
+        if (z == 3) return troll;
+        if (z == 4) return goliath;
     }
     else if (type == "Boss")
     {
-        if (currentMapIndex == 0) return hugeBear;
-        if (currentMapIndex == 1) return golem;
-        if (currentMapIndex == 2) return spider;
-        if (currentMapIndex == 3) return wyvern;
-        if (currentMapIndex == 4) return hydra;
+        if (z == 0) return hugeBear;
+        if (z == 1) return golem;
+        if (z == 2) return spider;
+        if (z == 3) return wyvern;
+        if (z == 4) return hydra;
     }
-
-    std::cerr << "No valid enemy found for combat.\n";
-    return goblin; // default fallback  
+    std::cerr << "No valid enemy found at tile (" << x << "," << y << "," << z << ")\n";
+    return goblin; // Fallback
 }
+
 
 void checkGameOver(Player& hero)
 {
@@ -230,7 +234,7 @@ void initiatePlayer()
 
 void checkGameCompletion()
 {
-    Tile& bossTile = maps[4].grid[8][7]; // Assuming boss is always at (8,7) on map 4
+    Tile& bossTile = cave.getCurrentMap(4).getTile(8, 7); // Boss is always at (8,7) on map 4
     if (bossTile.type == "Boss" && bossTile.cleared)
     {
         std::cout << "\nCongratulations, you completed Cave Delver!\n";
@@ -240,75 +244,64 @@ void checkGameCompletion()
     }
 }
 
-void handlePostMovementEvent(Player hero)
+void handlePostMovementEvent(Player& hero)
 {
-    Tile& tile = maps[currentMapIndex].grid[hero.coordinates[0]][hero.coordinates[1]];
-    std::string& type = tile.type; // Post-movement event handler
+    Tile& tile = cave.getCurrentMap(hero.coordinates[2]).getTile(hero.coordinates[0], hero.coordinates[1]);
+    std::string& type = tile.type;
     bool reached = tile.cleared;
-    int hp = hero.currentHealth;
 
-    std::cout << "\n You stepped on: " << type << "";
+    std::cout << "\nYou stepped on: " << type;
 
-    if (type == "Empty")
-    {
+    if (type == "Empty") {
         reached = true;
     }
-    else if (type == "Enemy" || type == "Boss")
-    {
-        if (!reached)
-        {
-            std::cout << "Combat begins!\n";
+    else if (type == "Enemy" || type == "Boss") {
+        if (!reached) {
+            std::cout << "\nCombat begins!\n";
             Enemy foe = getEnemyForTile(hero.coordinates);
             handleCombat(hero, foe);
         }
     }
-    else if (type == "Trap")
-    {
-        if (!reached)
-        {
-            std::cout << "It's a trap! You take 4 damage!\n";
+    else if (type == "Trap") {
+        if (!reached) {
+            std::cout << "\nIt's a trap! You take 4 damage!\n";
             hero.currentHealth -= 4;
             checkGameOver(hero);
         }
         reached = true;
     }
-    else if (type == "Rest")
-    {
-        if (!reached)
-        {
-            std::cout << "Rest spot! +5 Health and Mana.\n";
-            hero.currentHealth = clamp(hero.currentHealth + 5, 0, hero.maxHealth);
-            hero.currentMana = clamp(hero.currentMana + 5, 0, hero.maxMana);
-
+    else if (type == "Rest") {
+        if (!reached) {
+            std::cout << "\nRest spot! +5 Health and Mana.\n";
+            hero.currentHealth = std::clamp(hero.currentHealth + 5, 0, hero.maxHealth);
+            hero.currentMana = std::clamp(hero.currentMana + 5, 0, hero.maxMana);
         }
         reached = true;
     }
-    else if (type == "Treasure")
-    {
-        if (!reached)
-        {
-            std::cout << "You found a treasure! +2 Damage, +1 Initiative.\n";
+    else if (type == "Treasure") {
+        if (!reached) {
+            std::cout << "\nYou found a treasure! +2 Damage, +1 Initiative.\n";
             hero.damage += 2;
             hero.initiative += 1;
         }
         reached = true;
     }
-    else if (type == "Ladder")
-    {
-        std::cout << "You've found the ladder. Ascend to next floor? (Y/N): ";
+    else if (type == "Ladder") {
+        std::cout << "\nYou've found the ladder. Ascend to next floor? (Y/N): ";
         char response;
         std::cin >> response;
         clearInput();
         reached = true;
-        if (toupper(response) == 'Y')
-        {
-            currentMapIndex++;
+        if (toupper(response) == 'Y') {
+            hero.coordinates[2] += 1;
             hero.coordinates[0] = 0;
             hero.coordinates[1] = 0;
-            hero.coordinates[2] += 1;
-            std::cout << "You ascend to map " << (currentMapIndex + 1) << "!\n";
+            std::cout << "\nYou ascend to map " << (hero.coordinates[2]) << "!\n";
         }
     }
+
+    tile.cleared = reached;
+    checkGameCompletion(); // Optional if you want to check completion every move
 }
 
 void movePlayer(Player& hero)

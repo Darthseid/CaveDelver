@@ -4,6 +4,7 @@
 #include <mmsystem.h>  // For PlaySoundA and multimedia functions
 #include "MainMenu.h"
 #pragma comment(lib, "winmm.lib") // Linker directive for the Windows Multimedia library
+#pragma once
 
 
 void playBackgroundMusic()
@@ -11,6 +12,7 @@ void playBackgroundMusic()
     PlaySoundA("Vermin.wav", NULL, SND_FILENAME | SND_SYNC); // Background music function (unchanged)
     PlaySoundA("Tide.wav", NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 }
+
 
 int main() 
 {
