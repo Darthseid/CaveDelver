@@ -8,8 +8,6 @@
 const int MAP_SIZE = 10;
 const int TOTAL_MAPS = 5;
 
-extern Cave cave; // Declare global/shared cave instance
-
 class Tile  // Represents a single Tile (x,y,z) with a type and cleared status
 {
 public:
@@ -331,3 +329,5 @@ public:
             map.loadMap();
     }
 };
+
+extern Cave cave; // Declare global/shared cave instance

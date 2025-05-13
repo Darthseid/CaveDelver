@@ -8,12 +8,8 @@
 #include "DelverClasses.h"
 #include "DelverMap.h"
 #include "DelverTemplates.h"
-#include "Spells.h"
 #include "DelverHelpers.h"
 #pragma once
-
-
-Cave cave; // Define the global variable here
 
 void playerAttack(Enemy& foe, Player& hero)
 {

@@ -1,12 +1,14 @@
 #include "MainMenu.h"   // Include the corresponding header
-#include "GameStates.h" // Include header for initiatePlayer, loadPlayer declarations
+#include "DelverClasses.h" // Include header for Player, Enemy, Tile classes
+#include "DelverMap.h"
 #include "DelverHelpers.h"
+#include "GameStates.h" // Include header for initiatePlayer, loadPlayer declarations
 #include <iostream>
 #include <limits>   // For std::numeric_limits
 #include <ios>      // For std::streamsize
 #pragma once
 
-
+Cave cave;
 void mainMenuLoop()  // Definition of the main menu loop function
 {
     while (true)

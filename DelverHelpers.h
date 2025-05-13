@@ -6,15 +6,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
-#include "Spells.h"
-#include "DelverClasses.h"
-#include "DelverMap.h"
 #pragma once
 #undef min
 #undef max
-
-
-Cave cave; 
 
 inline bool randomChance(int percent)
 {
