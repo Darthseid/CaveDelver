@@ -180,6 +180,7 @@ void handleCombat(Player& hero, Enemy& foe)
         int y = hero.coordinates[1];
         int z = hero.coordinates[2];
         Tile& tile = cave.getCurrentMap(z).getTile(x, y);
+        clearTile(tile);
         overWorld(hero);
     }
 }
@@ -322,7 +323,7 @@ void movePlayer(Player& hero, const std::string& dir)
 
 void overWorld(Player& hero)
 {
-    while (true)
+    while (hero.currentHealth > 0)
     {
         std::cout << "\n=== Overworld Menu ===\n";
         std::cout << "Enter a direction (N/S/E/W/NE/NW/SE/SW), or:\n";
