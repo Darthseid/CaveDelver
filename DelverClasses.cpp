@@ -41,7 +41,7 @@ void Player::printStats() const
         << "Mana: " << currentMana << "/" << maxMana << "\n"
         << "Accuracy: " << accuracy << ", Evasion: " << evasion
         << ", Initiative: " << initiative << ", Damage: " << damage << "\n" << ", Level: " << level << ", Experience, " << experience
-        << "Position: (" << coordinates[0] << ", " << coordinates[1] << ")\n"
+        << " Position: (" << coordinates[0] << ", " << coordinates[1] << ")\n"
         << "Spells:\n";
     for (const auto& spell : spells)
         spell.print();

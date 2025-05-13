@@ -187,27 +187,35 @@ void handleCombat(Player& hero, Enemy& foe)
 void initiatePlayer()
 {
     Player p(
-        6,
-        3,
-        51,
-        0,
-        1,
-        2,
-        0, 0, 0
+        6,     // maxHealth
+        3,     // maxMana
+        51,    // accuracy
+        0,     // evasion
+        1,     // initiative
+        2,     // damage
+        0, 0, 0, // coordinates x, y, z
+        0, 1     // experience, level
     );
 
     p.currentHealth = p.maxHealth;
     p.currentMana = p.maxMana;
 
+    p.printStats();
+    p.experience = 5;
+    checkLevelUp(p);
+    p.experience = 0; // Reset XP after free upgrades
+
+    // Generate maps
     cave.getCurrentMap(0).generateMap1();
     cave.getCurrentMap(1).generateMap2();
     cave.getCurrentMap(2).generateMap3();
     cave.getCurrentMap(3).generateMap4();
     cave.getCurrentMap(4).generateMap5();
 
-    std::cout << "! Your journey begins...\n";
+    std::cout << "! Your level is now reset. Your journey begins...\n";
     overWorld(p);
 }
+
 
 void checkGameCompletion()
 {
