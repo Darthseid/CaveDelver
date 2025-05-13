@@ -1,34 +1,36 @@
-// --- Spells ---
+#pragma once // Use include guards or #pragma once
+
 #include <vector>
-#pragma once
+#include <string>
+#include "DelverClasses.h" // Make sure this includes the definitions for Spell, Enemy, Boss classes
 
-Spell spell_heal("Heal", 3, "Player recovers 50% of Missing Health.");
-Spell spell_fireball("Fireball", 6, "Player deals 7 Damage to Enemy");
-Spell spell_bless("Bless", 9, "Player deals +3 Damage and takes Half Damage for next 5 turns.");
-Spell spell_sleep("Sleep", 12, "Target enemy is stunned for 3 turns. 60% chance of success.");
-Spell spell_reflect("Reflect Damage", 15, "Enemy takes mirrored damage. Lasts 4 turns.");
+// --- Spell Declarations ---
+// Use 'extern' to declare that these objects are defined elsewhere (.cpp file)
+extern Spell spell_heal;
+extern Spell spell_fireball;
+extern Spell spell_bless;
+extern Spell spell_sleep;
+extern Spell spell_reflect;
 
-// --- Spell Collection for Player ---
-std::vector<Spell> playerSpells = 
-{
-    spell_heal,
-    spell_fireball,
-    spell_bless,
-    spell_sleep,
-    spell_reflect
-};
+// --- Spell Collection Declaration ---
+extern std::vector<Spell> playerSpells; // Declares the vector exists
 
+// --- Enemy Declarations ---
+extern Enemy goblin;
+extern Enemy orc;
+extern Enemy ogre;
+extern Enemy troll;
+extern Enemy goliath; // Note: Renamed the second Troll from your previous data
 
-// --- Enemies ---
-Enemy goblin("Goblin", 2, 40, 0, 0, 1, 1);
-Enemy orc("Orc", 5, 45, 5, 1, 2, 3);
-Enemy ogre("Ogre", 8, 50, 8, 2, 3, 5);
-Enemy troll("Troll", 11, 55, 11, 3, 4, 7);
-Enemy goliath("Goliath", 14, 65, 14, 4, 5, 9);
+// --- Boss Declarations ---
+extern Boss hugeBear;
+extern Boss golem;
+extern Boss spider; // Assuming class name consistency
+extern Boss wyvern;
+extern Boss hydra;
 
-// --- Bosses ---
-Boss hugeBear("Huge Bear", 8, 50, 10, 7, 3, 12, "First_Strike");
-Boss golem("Golem", 14, 60, 14, 3, 5, 18, "Anti-Mage");
-Boss spider("Giant Spider", 20, 70, 18, 4, 7, 24, "Poison_Bite");
-Boss wyvern("Wyvern", 26, 80, 22, 5, 9, 30, "Camouflage");
-Boss hydra("Hydra", 32, 90, 26, 6, 8, 0, "Multi-Heads");
+// Consider wrapping these in a namespace to avoid polluting the global scope
+// namespace GameData {
+//     extern Spell spell_heal;
+//     // ... etc ...
+// }

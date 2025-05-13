@@ -131,6 +131,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DelverClasses.cpp" />
+    <ClCompile Include="DelverHelpers.cpp" />
+    <ClCompile Include="DelverMap.cpp" />
+    <ClCompile Include="DelverTemplates.cpp" />
+    <ClCompile Include="GameStates.cpp" />
     <ClCompile Include="GameStates.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />

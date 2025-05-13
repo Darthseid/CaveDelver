@@ -1,26 +1,18 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
-#pragma once
-
 
 // --- Spell Class ---
-class Spell 
+class Spell
 {
 public:
     std::string name;
     int manaCost;
     std::string description;
-    Spell(const std::string& name, int manaCost, const std::string& description)
-        : name(name), manaCost(manaCost), description(description) 
-    {
-
-    }
-    void print() const 
-    {
-        std::cout << "Spell: " << name << ", Mana Cost: " << manaCost
-            << ", Description: " << description << "\n";
-    }
+    Spell(const std::string& name, int manaCost, const std::string& description);
+    void print() const;
 };
 
 class Player
@@ -43,37 +35,12 @@ public:
         int accuracy, int evasion,
         int initiative, int damage,
         int x = 0, int y = 0, int z = 0,
-        int experience = 0, int level = 1)
-        : maxHealth(maxHealth), currentHealth(maxHealth),
-        maxMana(maxMana), currentMana(maxMana),
-        accuracy(accuracy), evasion(evasion),
-        initiative(initiative), damage(damage),
-        experience(experience), level(level)
-    {
-        coordinates[0] = x;
-        coordinates[1] = y;
-        coordinates[2] = z;
-    }
-    void addSpell(const Spell& spell)
-    {
-        spells.push_back(spell);
-    }
-
-    void printStats() const
-    {
-        std::cout << "Health: " << currentHealth << "/" << maxHealth << "\n"
-            << "Mana: " << currentMana << "/" << maxMana << "\n"
-            << "Accuracy: " << accuracy << ", Evasion: " << evasion
-            << ", Initiative: " << initiative << ", Damage: " << damage << "\n" << ", Level: " << level << ", Experience, " << experience
-            << "Position: (" << coordinates[0] << ", " << coordinates[1] << ")\n"
-            << "Spells:\n";
-        for (const auto& spell : spells)
-            spell.print();
-    }
-
+        int experience = 0, int level = 1);
+    void addSpell(const Spell& spell);
+    void printStats() const;
 };
 
-class Enemy 
+class Enemy
 {
 public:
     std::string name;
@@ -85,43 +52,17 @@ public:
     int bounty; // experience reward
 
 public:
-    Enemy(const std::string& name, int health, int accuracy, int evasion, int initiative, int damage, int bounty)
-        : name(name), health(health), accuracy(accuracy), evasion(evasion),
-        initiative(initiative), damage(damage), bounty(bounty) {
-    }
-
-    virtual void print() const 
-    {
-        std::cout << "Enemy: " << name << "\n"
-            << "Health: " << health << "\n"
-            << "Accuracy: " << accuracy << "\n"
-            << "Evasion: " << evasion << "\n"
-            << "Initiative: " << initiative << "\n"
-            << "Damage: " << damage << "\n"
-            << "Bounty (XP): " << bounty << "\n";
-    }
+    Enemy(const std::string& name, int health, int accuracy, int evasion, int initiative, int damage, int bounty);
+    virtual void print() const;
     virtual ~Enemy() = default;
 };
 
-class Boss : public Enemy 
+class Boss : public Enemy
 {
 private:
     std::string special;
 
 public:
-    Boss(const std::string& name, int health, int accuracy, int evasion, int initiative, int damage, int bounty, const std::string& special)
-        : Enemy(name, health, accuracy, evasion, initiative, damage, bounty), special(special) {
-    }
-
-    void print() const override 
-    {
-        std::cout << "BOSS: " << name << "\n"
-            << "Health: " << health << "\n"
-            << "Accuracy: " << accuracy << "\n"
-            << "Evasion: " << evasion << "\n"
-            << "Initiative: " << initiative << "\n"
-            << "Damage: " << damage << "\n"
-            << "Bounty (XP): " << bounty << "\n"
-            << "Special Ability: " << special << "\n";
-    }
+    Boss(const std::string& name, int health, int accuracy, int evasion, int initiative, int damage, int bounty, const std::string& special);
+    void print() const override;
 };
