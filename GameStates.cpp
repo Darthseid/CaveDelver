@@ -281,62 +281,34 @@ void handlePostMovementEvent(Player& hero)
     checkGameCompletion();
 }
 
-void movePlayer(Player& hero)
+void movePlayer(Player& hero, const std::string& dir)
 {
-    while (true)
-    {
-        std::cout << "\nChoose direction (N/S/E/W/NE/NW/SE/SW): ";
-        std::string dir;
-        std::cin >> dir;
-        clearInput();
+    std::string input = dir;
+    for (auto& c : input) c = std::toupper(c);
 
-        for (auto& c : dir) c = std::toupper(c);
+    int newX = hero.coordinates[0];
+    int newY = hero.coordinates[1];
 
-        int newX = hero.coordinates[0];
-        int newY = hero.coordinates[1];
-
-        if (dir == "N")
-            newY += 1;
-        else if (dir == "S")
-            newY -= 1;
-        else if (dir == "E")
-            newX += 1;
-        else if (dir == "W")
-            newX -= 1;
-        else if (dir == "NE")
-        {
-            newX += 1;
-            newY += 1;
-        }
-        else if (dir == "NW")
-        {
-            newX -= 1;
-            newY += 1;
-        }
-        else if (dir == "SE")
-        {
-            newX += 1;
-            newY -= 1;
-        }
-        else if (dir == "SW")
-        {
-            newX -= 1;
-            newY -= 1;
-        }
-        else
-        {
-            std::cout << "Invalid input. Try N/S/E/W/NE/NW/SE/SW.\n";
-            continue;
-        }
-        if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE)
-        {
-            std::cout << "You cannot move off the map.\n";
-            continue;
-        }
-        hero.coordinates[0] = newX;
-        hero.coordinates[1] = newY;
-        break;
+    if (input == "N") newY += 1;
+    else if (input == "S") newY -= 1;
+    else if (input == "E") newX += 1;
+    else if (input == "W") newX -= 1;
+    else if (input == "NE") { newX += 1; newY += 1; }
+    else if (input == "NW") { newX -= 1; newY += 1; }
+    else if (input == "SE") { newX += 1; newY -= 1; }
+    else if (input == "SW") { newX -= 1; newY -= 1; }
+    else {
+        std::cout << "Invalid movement direction.\n";
+        return;
     }
+
+    if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE) {
+        std::cout << "You cannot move off the map.\n";
+        return;
+    }
+
+    hero.coordinates[0] = newX;
+    hero.coordinates[1] = newY;
     handlePostMovementEvent(hero);
 }
 
@@ -345,33 +317,34 @@ void overWorld(Player& hero)
     while (true)
     {
         std::cout << "\n=== Overworld Menu ===\n";
-        std::cout << "1. Move\n";
-        std::cout << "2. Show Current Map\n";
-        std::cout << "3. Heal (Cost: 3 Mana)\n";
+        std::cout << "Enter a direction (N/S/E/W/NE/NW/SE/SW), or:\n";
+        std::cout << "1. Show Current Map\n";
+        std::cout << "2. Heal (Cost: 3 Mana)\n";
+        std::cout << "3. Show Stats\n";
         std::cout << "4. Save Game\n";
         std::cout << "5. Quit Game\n";
-        std::cout << "Enter your choice: ";
-        int choice;
-        std::cin >> choice;
+        std::cout << "Input: ";
+
+        std::string input;
+        std::cin >> input;
         clearInput();
+
+        if (!isdigit(input[0])) {
+            movePlayer(hero, input);
+            continue;
+        }
+
+        int choice = std::stoi(input);
 
         switch (choice)
         {
         case 1:
-            movePlayer(hero);
-            break;
-
-        case 2:
             cave.getCurrentMap(hero.coordinates[2]).printMap(hero.coordinates[0], hero.coordinates[1]);
             break;
-
-        case 3: //Todo, change this to the player can cast a spell of their choice.
+        case 2: // TODO: Replace with spell selection
             if (hero.currentMana < 3)
-            {
                 std::cout << "Not enough mana to heal.\n";
-            }
-            else
-            {
+            else {
                 int missing = hero.maxHealth - hero.currentHealth;
                 int healAmount = missing / 2;
                 hero.currentHealth += healAmount;
@@ -379,6 +352,9 @@ void overWorld(Player& hero)
                 std::cout << "You heal for " << healAmount << " HP. Current HP: "
                     << hero.currentHealth << "/" << hero.maxHealth << "\n";
             }
+            break;
+        case 3:
+            hero.printStats();
             break;
         case 4:
             savePlayer(hero);
