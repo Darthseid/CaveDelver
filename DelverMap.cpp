@@ -33,7 +33,7 @@ Tile& Map::getTile(int x, int y)
 
 void Map::printMap(const int playerX, const int playerY) const
 {
-    std::cout << "\n=== Map Floor " << z << " ===";
+    std::cout << "\n=== Map Floor " << z << " ===\n";
     for (int y = MAP_SIZE - 1; y >= 0; --y)
     {
         for (int x = 0; x < MAP_SIZE; ++x)
@@ -55,9 +55,9 @@ void Map::printMap(const int playerX, const int playerY) const
                 else std::cout << " ? ";
             }
         }
-        std::cout << "";
+        std::cout << std::endl;
     }
-    std::cout << "\n Legend: P=Player _=Empty E=Enemy B=Boss T=Trap X=Treasure R=Rest L=Ladder ?=Unexplored";
+    std::cout << " Legend: P=Player _=Empty E=Enemy B=Boss T=Trap X=Treasure R=Rest L=Ladder ?=Unexplored\n";
 }
 
 void Map::saveMap() const

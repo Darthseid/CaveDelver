@@ -88,10 +88,6 @@ bool playerGoesFirst(int playerInit, int enemyInit)
     return randomChance(50);
 }
 
-void overWorld(Player& hero);
-
-void spellMenu(Player& hero, Enemy& foe);
-
 void playerCombatTurn(Player& hero, Enemy& foe)
 {
     std::cout << "\nChoose Action: [A]ttack, [M]agic, [F]lee: ";
@@ -369,7 +365,7 @@ void overWorld(Player& hero)
             cave.getCurrentMap(hero.coordinates[2]).printMap(hero.coordinates[0], hero.coordinates[1]);
             break;
 
-        case 3:
+        case 3: //Todo, change this to the player can cast a spell of their choice.
             if (hero.currentMana < 3)
             {
                 std::cout << "Not enough mana to heal.\n";

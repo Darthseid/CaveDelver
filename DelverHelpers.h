@@ -10,7 +10,6 @@
 class Player;
 class Spell;
 
-// Utility functions
 inline bool randomChance(int percent)
 {
     static std::mt19937 gen(std::random_device{}());
@@ -29,7 +28,6 @@ inline void clearInput()
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-// Non-inline function declarations
 void savePlayer(const Player& hero);
-Player loadPlayer();
+void loadPlayer();
 void checkLevelUp(Player& hero);

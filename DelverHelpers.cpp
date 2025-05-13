@@ -2,6 +2,7 @@
 #include "DelverClasses.h"
 #include "Spells.h"
 #include "DelverMap.h"
+#include "GameStates.h"
 
 extern Cave cave;
 
@@ -30,7 +31,7 @@ void savePlayer(const Player& hero)
     std::cout << "Player saved successfully.\n";
 }
 
-Player loadPlayer()
+void loadPlayer()
 {
     std::ifstream in("Player.txt");
     if (!in.is_open())
@@ -38,9 +39,6 @@ Player loadPlayer()
         std::cerr << "Error: Could not open Player.txt\n";
         exit(1);
     }
-
-    std::string name;
-    std::getline(in, name);
 
     int maxHealth, currentHealth;
     in >> maxHealth >> currentHealth;
@@ -80,7 +78,7 @@ Player loadPlayer()
 
     cave.getCurrentMap(z).loadMap();
     std::cout << "Player loaded: " << "\n";
-    return player;
+    overWorld(player);
 }
 
 void checkLevelUp(Player& hero)
